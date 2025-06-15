@@ -33,6 +33,10 @@ npm install
 ./mvnw
 ```
 
+```bash
+docker compose -f src/main/docker/redis.yml up -d
+```
+
 
 <!-- jhipster-needle-startupCommand -->
 
@@ -42,5 +46,6 @@ npm install
 - [Package types](documentation/package-types.md)
 - [Assertions](documentation/assertions.md)
 - [sonar](documentation/sonar.md)
+- [Redis](documentation/redis.md)
 
 <!-- jhipster-needle-documentation -->

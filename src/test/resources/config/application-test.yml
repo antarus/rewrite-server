@@ -3,3 +3,6 @@ logging:
 spring:
   main:
     banner-mode: 'off'
+  data:
+    redis:
+      url: ${TEST_REDIS_URL}
