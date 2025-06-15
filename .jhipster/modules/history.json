@@ -43,5 +43,16 @@
       "indentSize" : 2,
       "springConfigurationFormat" : "yaml"
     }
+  }, {
+    "module" : "prettier",
+    "date" : "2025-06-15T08:54:42.704336413Z",
+    "properties" : {
+      "packageName" : "fr.rewrite.back",
+      "projectName" : "Rewrite back",
+      "baseName" : "rewriteBack",
+      "endOfLine" : "lf",
+      "indentSize" : 2,
+      "springConfigurationFormat" : "yaml"
+    }
   } ]
 }
