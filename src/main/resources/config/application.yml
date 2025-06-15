@@ -1,0 +1,8 @@
+logging:
+  level:
+    fr:
+      rewrite:
+        back: INFO
+spring:
+  application:
+    name: RewriteBack
