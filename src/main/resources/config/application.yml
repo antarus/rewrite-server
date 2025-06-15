@@ -10,3 +10,7 @@ spring:
     redis:
       database: 0
       url: redis://localhost:6379
+  jackson:
+    default-property-inclusion: non_absent
+server:
+  port: 8080

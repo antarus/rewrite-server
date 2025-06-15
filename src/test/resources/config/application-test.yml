@@ -6,3 +6,5 @@ spring:
   data:
     redis:
       url: ${TEST_REDIS_URL}
+server:
+  port: 0
