@@ -32,5 +32,16 @@
       "indentSize" : 2,
       "springConfigurationFormat" : "yaml"
     }
+  }, {
+    "module" : "maven-java",
+    "date" : "2025-06-15T08:54:42.640247872Z",
+    "properties" : {
+      "packageName" : "fr.rewrite.back",
+      "projectName" : "Rewrite back",
+      "baseName" : "rewriteBack",
+      "endOfLine" : "lf",
+      "indentSize" : 2,
+      "springConfigurationFormat" : "yaml"
+    }
   } ]
 }
