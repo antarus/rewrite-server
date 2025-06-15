@@ -142,5 +142,17 @@
       "indentSize" : 2,
       "springConfigurationFormat" : "yaml"
     }
+  }, {
+    "module" : "logs-spy",
+    "date" : "2025-06-15T09:09:26.717764534Z",
+    "properties" : {
+      "packageName" : "fr.rewrite.back",
+      "projectName" : "Rewrite back",
+      "baseName" : "rewriteBack",
+      "endOfLine" : "lf",
+      "indentSize" : 2,
+      "springConfigurationFormat" : "yaml",
+      "serverPort" : 8080
+    }
   } ]
 }

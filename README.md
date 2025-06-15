@@ -47,5 +47,6 @@ docker compose -f src/main/docker/redis.yml up -d
 - [Assertions](documentation/assertions.md)
 - [sonar](documentation/sonar.md)
 - [Redis](documentation/redis.md)
+- [Logs Spy](documentation/logs-spy.md)
 
 <!-- jhipster-needle-documentation -->
