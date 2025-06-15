@@ -87,5 +87,16 @@
       "indentSize" : 2,
       "springConfigurationFormat" : "yaml"
     }
+  }, {
+    "module" : "java-base",
+    "date" : "2025-06-15T08:54:43.035339545Z",
+    "properties" : {
+      "packageName" : "fr.rewrite.back",
+      "projectName" : "Rewrite back",
+      "baseName" : "rewriteBack",
+      "endOfLine" : "lf",
+      "indentSize" : 2,
+      "springConfigurationFormat" : "yaml"
+    }
   } ]
 }
