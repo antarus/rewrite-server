@@ -109,5 +109,16 @@
       "indentSize" : 2,
       "springConfigurationFormat" : "yaml"
     }
+  }, {
+    "module" : "sonar-qube-java-backend",
+    "date" : "2025-06-15T08:54:43.209697759Z",
+    "properties" : {
+      "packageName" : "fr.rewrite.back",
+      "projectName" : "Rewrite back",
+      "baseName" : "rewriteBack",
+      "endOfLine" : "lf",
+      "indentSize" : 2,
+      "springConfigurationFormat" : "yaml"
+    }
   } ]
 }
