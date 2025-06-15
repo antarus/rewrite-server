@@ -1,12 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>fr.rewrite.back</groupId>
-  <artifactId>rewrite-back</artifactId>
+  <groupId>fr.rewrite.server</groupId>
+  <artifactId>rewrite-server</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>rewriteBack</name>
-  <description>Rewrite back</description>
+  <name>rewriteServer</name>
+  <description>Rewrite server</description>
   <packaging>jar</packaging>
   <dependencyManagement>
     <dependencies>
@@ -20,6 +24,62 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>${jgit.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-core</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-xml</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-maven</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-yaml</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-java</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-java-8</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-java-11</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-java-17</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrewrite</groupId>
+      <artifactId>rewrite-java-21</artifactId>
+      <version>${openrewrite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -66,6 +126,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.30</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainers.version}</version>
@@ -79,9 +145,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <maven.version>3.6.3</maven.version>
-    
-    
-    
+    <commons-io.version>2.16.1</commons-io.version>
     <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
     <compiler-plugin.version>3.14.0</compiler-plugin.version>
     <surefire-plugin.version>3.5.3</surefire-plugin.version>
@@ -94,6 +158,11 @@
     <spring-boot.version>3.5.0</spring-boot.version>
     <reflections.version>0.10.2</reflections.version>
     <testcontainers.version>1.21.1</testcontainers.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jgit.version>7.3.0.202506031305-r</jgit.version>
+    <openrewrite.version>8.55.3</openrewrite.version>
   </properties>
 
   <build>
@@ -116,6 +185,16 @@
     </resources>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.openrewrite.maven</groupId>
+          <artifactId>rewrite-maven-plugin</artifactId>
+          <version>6.11.0</version>
+          <configuration>
+            <activeRecipes>
+              <recipe>org.openrewrite.java.OrderImports</recipe>
+            </activeRecipes>
+          </configuration>
+        </plugin>
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
           <version>${maven-enforcer-plugin.version}</version>
@@ -275,9 +354,9 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <mainClass>fr.rewrite.back.RewriteBackApp</mainClass>
-          </configuration>
+          <!--          <configuration>-->
+          <!--            <mainClass>fr.rewrite.server.RewriteBackApp</mainClass>-->
+          <!--          </configuration>-->
         </plugin>
       </plugins>
     </pluginManagement>
@@ -288,6 +367,14 @@
         <configuration>
           <release>${java.version}</release>
           <parameters>true</parameters>
+
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.38</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>
@@ -330,38 +417,38 @@
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>${maven-checkstyle-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>validate</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.puppycrawl.tools</groupId>
-            <artifactId>checkstyle</artifactId>
-            <version>${checkstyle.version}</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <configLocation>checkstyle.xml</configLocation>
-          <consoleOutput>true</consoleOutput>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <sourceDirectories>
-            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-          </sourceDirectories>
-          <testSourceDirectories>
-            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
-          </testSourceDirectories>
-        </configuration>
-      </plugin>
+      <!--      <plugin>-->
+      <!--        <artifactId>maven-checkstyle-plugin</artifactId>-->
+      <!--        <version>${maven-checkstyle-plugin.version}</version>-->
+      <!--        <executions>-->
+      <!--          <execution>-->
+      <!--            <id>validate</id>-->
+      <!--            <phase>validate</phase>-->
+      <!--            <goals>-->
+      <!--              <goal>check</goal>-->
+      <!--            </goals>-->
+      <!--          </execution>-->
+      <!--        </executions>-->
+      <!--        <dependencies>-->
+      <!--          <dependency>-->
+      <!--            <groupId>com.puppycrawl.tools</groupId>-->
+      <!--            <artifactId>checkstyle</artifactId>-->
+      <!--            <version>${checkstyle.version}</version>-->
+      <!--          </dependency>-->
+      <!--        </dependencies>-->
+      <!--        <configuration>-->
+      <!--          <configLocation>checkstyle.xml</configLocation>-->
+      <!--          <consoleOutput>true</consoleOutput>-->
+      <!--          <failsOnError>true</failsOnError>-->
+      <!--          <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+      <!--          <sourceDirectories>-->
+      <!--            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>-->
+      <!--          </sourceDirectories>-->
+      <!--          <testSourceDirectories>-->
+      <!--            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>-->
+      <!--          </testSourceDirectories>-->
+      <!--        </configuration>-->
+      <!--      </plugin>-->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
