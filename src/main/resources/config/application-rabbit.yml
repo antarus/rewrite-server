@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: rewrite
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # Enable publisher confirms (important for reliable messaging)
+    publisher-returns: true
+#    publisher-confirms: correlated

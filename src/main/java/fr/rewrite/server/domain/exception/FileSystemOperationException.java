@@ -1,6 +1,6 @@
 package fr.rewrite.server.domain.exception;
 
-public class FileSystemOperationException extends Exception {
+public class FileSystemOperationException extends RuntimeException {
 
   public FileSystemOperationException(String message) {
     super(message);

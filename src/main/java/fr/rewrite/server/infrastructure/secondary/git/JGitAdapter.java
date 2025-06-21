@@ -1,8 +1,8 @@
 package fr.rewrite.server.infrastructure.secondary.git;
 
 import fr.rewrite.server.application.dto.Credentials;
-import fr.rewrite.server.domain.GitRepositoryPort;
 import fr.rewrite.server.domain.exception.GitOperationException;
+import fr.rewrite.server.domain.spi.GitRepositoryPort;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,13 +12,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.springframework.stereotype.Component;
 
-@Component
 public class JGitAdapter implements GitRepositoryPort {
 
   @Override

@@ -1,7 +1,7 @@
 package fr.rewrite.server.infrastructure.secondary.buildtool;
 
-import fr.rewrite.server.domain.BuildToolPort;
 import fr.rewrite.server.domain.exception.BuildToolException;
+import fr.rewrite.server.domain.spi.BuildToolPort;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,10 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MavenBuildToolAdapter implements BuildToolPort {
 
   @Override

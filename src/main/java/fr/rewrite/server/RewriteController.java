@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-@RestController // Indique que c'est un contrôleur REST
-@RequestMapping("/api/rewrite") // Chemin de base pour toutes les requêtes de ce contrôleur
+//@RestController // Indique que c'est un contrôleur REST
+//@RequestMapping("/api/rewrite") // Chemin de base pour toutes les requêtes de ce contrôleur
 public class RewriteController {
 
   private final RewriteOrchestrator rewriteOrchestrator;
@@ -25,7 +25,7 @@ public class RewriteController {
     try {
       System.out.println(config);
       // Lancer le processus de réécriture
-      rewriteOrchestrator.runRewriteProcess(config);
+      //      rewriteOrchestrator.runRewriteProcess(config);
       return ResponseEntity.ok("Rewrite process started successfully.");
     } catch (GitOperationException e) {
       // Exceptions métier liées à Git -> 400 Bad Request

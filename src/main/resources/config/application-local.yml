@@ -2,4 +2,4 @@ logging:
   level:
     fr:
       rewrite:
-        back: DEBUG
+        server: INFO

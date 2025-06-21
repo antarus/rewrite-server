@@ -33,6 +33,9 @@
   <logger name="org.reflections" level="WARN" />
   <logger name="org.springframework.data.redis" level="WARN" />
   <logger name="io.undertow" level="WARN" />
+  <logger name="org.postgresql" level="WARN" />
+  <logger name="org.hibernate.orm" level="WARN" />
+  <logger name="org.hibernate.ejb.HibernatePersistence" level="OFF" />
   <!-- jhipster-needle-logback-add-log -->
 
   <root level="${log.level}">

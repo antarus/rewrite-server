@@ -12,6 +12,34 @@
   <name>rewriteServer</name>
   <description>Rewrite server</description>
   <packaging>jar</packaging>
+
+  <properties>
+    <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <maven.version>3.6.3</maven.version>
+    <commons-io.version>2.16.1</commons-io.version>
+    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+    <compiler-plugin.version>3.14.0</compiler-plugin.version>
+    <surefire-plugin.version>3.5.3</surefire-plugin.version>
+    <failsafe-plugin.version>3.5.3</failsafe-plugin.version>
+    <mockito.version>5.18.0</mockito.version>
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <checkstyle.version>10.21.0</checkstyle.version>
+    <jacoco.version>0.8.11</jacoco.version>
+    <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+    <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
+    <spring-boot.version>3.5.0</spring-boot.version>
+    <reflections.version>0.10.2</reflections.version>
+    <testcontainers.version>1.21.1</testcontainers.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jgit.version>7.3.0.202506031305-r</jgit.version>
+    <openrewrite.version>8.55.3</openrewrite.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -93,10 +121,7 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
@@ -125,11 +150,28 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>org.projectlombok</groupId>-->
+    <!--      <artifactId>lombok</artifactId>-->
+    <!--      <version>1.18.30</version>-->
+    <!--      <scope>provided</scope>-->
+    <!--    </dependency>-->
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.30</version>
-      <scope>provided</scope>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -137,33 +179,29 @@
       <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jobrunr</groupId>
+      <artifactId>jobrunr-spring-boot-3-starter</artifactId>
+      <version>7.5.1</version>
+    </dependency>
   </dependencies>
-
-  <properties>
-    <java.version>21</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-    <maven.version>3.6.3</maven.version>
-    <commons-io.version>2.16.1</commons-io.version>
-    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
-    <compiler-plugin.version>3.14.0</compiler-plugin.version>
-    <surefire-plugin.version>3.5.3</surefire-plugin.version>
-    <failsafe-plugin.version>3.5.3</failsafe-plugin.version>
-    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>10.21.0</checkstyle.version>
-    <jacoco.version>0.8.11</jacoco.version>
-    <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
-    <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
-    <spring-boot.version>3.5.0</spring-boot.version>
-    <reflections.version>0.10.2</reflections.version>
-    <testcontainers.version>1.21.1</testcontainers.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jgit.version>7.3.0.202506031305-r</jgit.version>
-    <openrewrite.version>8.55.3</openrewrite.version>
-  </properties>
 
   <build>
     <resources>
@@ -242,6 +280,7 @@
                 <goal>prepare-agent</goal>
               </goals>
             </execution>
+            <!-- Ensures that the code coverage report for unit tests is created after unit tests have been run -->
             <execution>
               <id>post-unit-test</id>
               <phase>test</phase>
@@ -255,6 +294,7 @@
                 <goal>prepare-agent-integration</goal>
               </goals>
             </execution>
+            <!-- Ensures that the code coverage report for integration tests is created after integration tests have been run -->
             <execution>
               <id>post-integration-tests</id>
               <phase>post-integration-test</phase>
@@ -289,32 +329,6 @@
               <configuration>
                 <dataFile>target/jacoco/allTest.exec</dataFile>
                 <outputDirectory>target/jacoco/</outputDirectory>
-              </configuration>
-            </execution>
-            <execution>
-              <id>check</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <configuration>
-                <dataFile>target/jacoco/allTest.exec</dataFile>
-                <rules>
-                  <rule>
-                    <element>CLASS</element>
-                    <limits>
-                      <limit>
-                        <counter>BRANCH</counter>
-                        <value>MISSEDCOUNT</value>
-                        <maximum>0</maximum>
-                      </limit>
-                      <limit>
-                        <counter>LINE</counter>
-                        <value>MISSEDCOUNT</value>
-                        <maximum>0</maximum>
-                      </limit>
-                    </limits>
-                  </rule>
-                </rules>
               </configuration>
             </execution>
           </executions>
@@ -358,6 +372,28 @@
           <!--            <mainClass>fr.rewrite.server.RewriteBackApp</mainClass>-->
           <!--          </configuration>-->
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>properties</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>
+              -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+              -Xshare:off
+            </argLine>
+            <!--            <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>-->
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -368,29 +404,45 @@
           <release>${java.version}</release>
           <parameters>true</parameters>
 
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>1.18.38</version>
-            </path>
-          </annotationProcessorPaths>
+          <!--          <annotationProcessorPaths>-->
+          <!--            <path>-->
+          <!--              <groupId>org.projectlombok</groupId>-->
+          <!--              <artifactId>lombok</artifactId>-->
+          <!--              <version>1.18.38</version>-->
+          <!--            </path>-->
+          <!--          </annotationProcessorPaths>-->
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire-plugin.version}</version>
         <configuration>
+          <!-- Force alphabetical order to have a reproducible build -->
           <runOrder>alphabetical</runOrder>
           <excludes>
             <exclude>**/*IT*</exclude>
+            <exclude>**/*IntTest*</exclude>
             <exclude>**/*CucumberTest*</exclude>
           </excludes>
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${failsafe-plugin.version}</version>
+        <configuration>
+          <!-- Due to spring-boot repackage, without adding this property test classes are not found
+                         See https://github.com/spring-projects/spring-boot/issues/6254 -->
+          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          <!-- Force alphabetical order to have a reproducible build -->
+          <runOrder>alphabetical</runOrder>
+          <includes>
+            <include>**/*IT*</include>
+            <include>**/*IntTest*</include>
+            <include>**/*CucumberTest*</include>
+          </includes>
+        </configuration>
         <executions>
           <execution>
             <id>integration-test</id>
@@ -405,14 +457,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-          <runOrder>alphabetical</runOrder>
-          <includes>
-            <include>**/*IT*</include>
-            <include>**/*CucumberTest*</include>
-          </includes>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>

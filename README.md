@@ -124,6 +124,10 @@ java -jar target/rewrite-cli-client-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
 docker compose -f src/main/docker/redis.yml up -d
 ```
 
+```bash
+docker compose -f src/main/docker/postgresql.yml up -d
+```
+
 <!-- jhipster-needle-startupCommand -->
 
 ## Documentation
@@ -135,5 +139,6 @@ docker compose -f src/main/docker/redis.yml up -d
 - [Redis](documentation/redis.md)
 - [Logs Spy](documentation/logs-spy.md)
 - [CORS configuration](documentation/cors-configuration.md)
+- [PostgreSQL](documentation/postgresql.md)
 
 <!-- jhipster-needle-documentation -->

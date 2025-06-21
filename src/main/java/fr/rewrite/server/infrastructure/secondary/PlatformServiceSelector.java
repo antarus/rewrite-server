@@ -2,11 +2,10 @@ package fr.rewrite.server.infrastructure.secondary;
 
 import fr.rewrite.server.application.dto.PlatformConfig;
 import fr.rewrite.server.application.dto.PullRequestDetails;
-import fr.rewrite.server.domain.PullRequestServicePort;
 import fr.rewrite.server.domain.exception.GitOperationException;
+import fr.rewrite.server.domain.spi.PullRequestServicePort;
 import fr.rewrite.server.infrastructure.secondary.api.GitHubApiAdapter;
 import fr.rewrite.server.infrastructure.secondary.api.GitLabApiAdapter;
-import java.io.IOException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 

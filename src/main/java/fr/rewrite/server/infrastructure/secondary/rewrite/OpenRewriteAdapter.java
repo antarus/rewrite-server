@@ -1,6 +1,6 @@
 package fr.rewrite.server.infrastructure.secondary.rewrite;
 
-import fr.rewrite.server.domain.RewriteEnginePort;
+import fr.rewrite.server.domain.spi.RewriteEnginePort;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -12,11 +12,7 @@ import org.openrewrite.Result;
 import org.openrewrite.SourceFile;
 import org.openrewrite.internal.InMemoryLargeSourceSet;
 import org.openrewrite.java.JavaParser;
-import org.openrewrite.marker.BuildTool; // Importez BuildTool
-import org.openrewrite.marker.Markers; // Importez Markers
-import org.springframework.stereotype.Component;
 
-@Component
 public class OpenRewriteAdapter implements RewriteEnginePort {
 
   @Override

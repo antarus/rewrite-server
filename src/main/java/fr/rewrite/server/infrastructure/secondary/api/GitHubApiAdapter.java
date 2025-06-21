@@ -2,8 +2,8 @@ package fr.rewrite.server.infrastructure.secondary.api;
 
 import fr.rewrite.server.application.dto.PlatformConfig;
 import fr.rewrite.server.application.dto.PullRequestDetails;
-import fr.rewrite.server.domain.PullRequestServicePort;
 import fr.rewrite.server.domain.exception.GitOperationException;
+import fr.rewrite.server.domain.spi.PullRequestServicePort;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

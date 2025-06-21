@@ -1,36 +1,41 @@
 package fr.rewrite.server.infrastructure.secondary.filesystem;
 
-import fr.rewrite.server.domain.FileSystemPort;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
+import fr.rewrite.server.domain.spi.DatastorePort;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NioFileSystemAdapter implements FileSystemPort {
+public class NioFileSystemAdapter implements DatastorePort {
+
+  private static final Logger log = LoggerFactory.getLogger(NioFileSystemAdapter.class);
 
   @Override
-  public void createDirectory(Path path) throws FileSystemOperationException { // Changement
+  public void createDatastore(Path path) throws FileSystemOperationException { // Changement
+    log.debug("Creating datastore {}", path);
+
     try {
       Files.createDirectories(path);
-      System.out.println("Directory created: " + path);
+      log.info("Directory created: {}", path);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to create directory: " + path + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to create datastore: " + path + ". " + e.getMessage(), e);
     }
   }
 
   @Override
-  public void deleteDirectory(Path directory) throws FileSystemOperationException { // Changement
+  public void deleteDatastore(Path directory) throws FileSystemOperationException { // Changement
     if (!Files.exists(directory)) {
-      System.out.println("Directory does not exist, skipping deletion: " + directory);
+      log.warn("Datastore does not exist, skipping deletion: {}", directory);
       return;
     }
     try {
@@ -50,9 +55,9 @@ public class NioFileSystemAdapter implements FileSystemPort {
           }
         }
       );
-      System.out.println("Directory deleted: " + directory);
+      log.info("Datastore deleted: {}", directory);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to delete directory: " + directory + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to delete Datastore: " + directory + ". " + e.getMessage(), e);
     }
   }
 
@@ -64,7 +69,7 @@ public class NioFileSystemAdapter implements FileSystemPort {
     try (Stream<Path> walk = Files.walk(directory)) {
       return walk.filter(Files::isRegularFile).collect(Collectors.toSet());
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to list files in directory: " + directory + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to list files in datastore: " + directory + ". " + e.getMessage(), e);
     }
   }
 }

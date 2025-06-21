@@ -1,6 +1,6 @@
 package fr.rewrite.server.domain.exception;
 
-public class BuildToolException extends Exception {
+public class BuildToolException extends RuntimeException {
 
   public BuildToolException(String message) {
     super(message);

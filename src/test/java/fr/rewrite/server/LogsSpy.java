@@ -49,7 +49,6 @@ public final class LogsSpy {
   }
 
   private List<ILoggingEvent> logEvents() {
-    // Copy the list to avoid concurrent modification exceptions
     return List.copyOf(appender.list);
   }
 
