@@ -1,4 +1,4 @@
-# Rewrite back
+# Rewrite server
 
 ## Prerequisites
 

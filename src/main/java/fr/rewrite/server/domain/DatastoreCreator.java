@@ -5,6 +5,7 @@ import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.spi.DatastorePort;
 import fr.rewrite.server.domain.spi.EventBusPort;
 import fr.rewrite.server.shared.error.domain.Assert;
+
 import java.nio.file.Path;
 
 @DomainService

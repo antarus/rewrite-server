@@ -3,3 +3,10 @@ logging:
     fr:
       rewrite:
         server: INFO
+management:
+  endpoints:
+    access:
+      default: unrestricted
+    web:
+      exposure:
+        include: '*'

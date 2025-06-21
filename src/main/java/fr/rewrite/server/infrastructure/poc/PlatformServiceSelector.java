@@ -4,8 +4,8 @@ import fr.rewrite.server.application.dto.PlatformConfig;
 import fr.rewrite.server.application.dto.PullRequestDetails;
 import fr.rewrite.server.domain.exception.GitOperationException;
 import fr.rewrite.server.domain.spi.PullRequestServicePort;
-import fr.rewrite.server.infrastructure.secondary.api.GitHubApiAdapter;
-import fr.rewrite.server.infrastructure.secondary.api.GitLabApiAdapter;
+import fr.rewrite.server.infrastructure.poc.GitHubApiAdapter;
+import fr.rewrite.server.infrastructure.poc.GitLabApiAdapter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 

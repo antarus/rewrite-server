@@ -22,7 +22,7 @@ public class RepoRewriteController {
 
   @PostMapping
   public ResponseEntity<String> submitJob(@RequestBody RewriteConfig config) {
-    RewriteId id = rewriteARepo.initARewrite(config.repoUrl());
+    RewriteId id = rewriteARepo.createDatastore(config.repoUrl());
 
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(id.toString());
   }

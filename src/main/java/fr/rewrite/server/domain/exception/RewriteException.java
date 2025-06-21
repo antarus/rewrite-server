@@ -77,6 +77,10 @@ public class RewriteException extends RuntimeException {
     return builder(StandardErrorKey.BAD_REQUEST.get()).status(ErrorStatus.BAD_REQUEST).message(message).build();
   }
 
+  public static RewriteException conflict(String message) {
+    return builder(StandardErrorKey.CONFLICT.get()).status(ErrorStatus.CONFLICT).message(message).build();
+  }
+
   public static RewriteExceptionBuilder technicalErrorBuilder(String message) {
     return builder(StandardErrorKey.INTERNAL_SERVER_ERROR.get()).message(message);
   }

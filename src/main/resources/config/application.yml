@@ -70,7 +70,7 @@ org:
   jobrunr:
     job-scheduler:
       enabled: true
-
+    
     background-job-server:
       enabled: true
       worker-count: 4
@@ -84,3 +84,26 @@ rewrite:
   server:
     config: /home/cedric/rewrite/config
     work: /home/cedric/rewrite/repository
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  endpoints:
+    access:
+      default: none
+    jmx:
+      exposure:
+        exclude: '*'
+    web:
+      base-path: /management
+      exposure:
+        include:
+        - configprops
+        - env
+        - health
+        - info
+        - logfile
+        - loggers
+        - threaddump

@@ -44,11 +44,12 @@ public class JsonFileSystemRepository implements DataRepository {
   }
 
   @Override
-  public void save(RewriteId id, State data) throws DataAccessException {
+  public void save(State data) throws DataAccessException {
+    Assert.notNull("data", data);
     try {
-      Path filePath = getFilePath(id);
+      Path filePath = getFilePath(data.rewriteId());
       objectMapper.writeValue(filePath.toFile(), data);
-      log.debug("Save Data for ID '{}' in '{}'", id, filePath);
+      log.debug("Save Data for ID '{}' in '{}'", data.rewriteId().get(), filePath);
     } catch (Exception e) {
       throw new DataAccessException(e.getMessage(), e);
     }
