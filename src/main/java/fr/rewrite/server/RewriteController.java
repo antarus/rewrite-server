@@ -1,12 +1,12 @@
 package fr.rewrite.server;
 
-import fr.rewrite.server.application.RewriteOrchestrator;
-import fr.rewrite.server.application.dto.RewriteConfig;
 import fr.rewrite.server.domain.exception.GitOperationException;
-import java.io.IOException;
+import fr.rewrite.server.poc.application.RewriteOrchestrator;
+import fr.rewrite.server.poc.application.dto.RewriteConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 //@RestController // Indique que c'est un contrôleur REST

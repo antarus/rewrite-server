@@ -8,6 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.events.AnotherTestEvent;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.TestEvent;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@UnitTest
 class InMemoryEventBusAdapterTest {
 
   private InMemoryEventBusAdapter eventBusAdapter;

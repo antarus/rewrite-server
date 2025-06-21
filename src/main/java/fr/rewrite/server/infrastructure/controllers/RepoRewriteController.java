@@ -1,8 +1,8 @@
 package fr.rewrite.server.infrastructure.controllers;
 
-import fr.rewrite.server.application.dto.RewriteConfig;
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.feature.RewriteARepo;
+import fr.rewrite.server.poc.application.dto.RewriteConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/rewrite")
-public class RepoRewriteController {
+class RepoRewriteController {
 
   private final RewriteARepo rewriteARepo;
 

@@ -8,6 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
 import fr.rewrite.server.domain.events.TestEvent;
@@ -20,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
+@UnitTest
 class EventServiceAdapterTest {
 
   private EventBusPort mockEventBus;

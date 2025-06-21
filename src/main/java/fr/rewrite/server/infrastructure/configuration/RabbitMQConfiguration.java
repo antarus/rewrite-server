@@ -1,17 +1,8 @@
 package fr.rewrite.server.infrastructure.configuration;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
 import fr.rewrite.server.domain.spi.EventBusPort;
-import fr.rewrite.server.infrastructure.secondary.event.DomainEventJacksonModule;
-import fr.rewrite.server.infrastructure.secondary.event.DomainEventMixIn;
 import fr.rewrite.server.infrastructure.secondary.event.GenericDomainEventsRabbitMQListener;
 import fr.rewrite.server.infrastructure.secondary.event.RabbitMQEventBusAdapter;
 import org.springframework.amqp.core.TopicExchange;

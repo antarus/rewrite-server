@@ -1,4 +1,4 @@
-package fr.rewrite.server.application.dto;
+package fr.rewrite.server.poc.application.dto;
 
 public record Credentials(
   String username,

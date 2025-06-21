@@ -1,4 +1,4 @@
-package fr.rewrite.server;
+package fr.rewrite.server.poc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,17 +15,13 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-// Pour d'éventuels diffs avancés, non directement utilisé ici
 import org.eclipse.jgit.lib.ObjectReader;
-// Pour d'éventuels diffs avancés
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
-// Pour d'éventuels diffs avancés
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
-// Corrected import
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.openrewrite.*;
 import org.openrewrite.config.Environment;

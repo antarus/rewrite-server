@@ -2,11 +2,13 @@ package fr.rewrite.server.domain.events;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import fr.rewrite.server.UnitTest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
+@UnitTest
 public class RepositoryCreatedEventTest {
 
   @Test

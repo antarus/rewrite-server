@@ -1,9 +1,9 @@
-package fr.rewrite.server.infrastructure.secondary.api;
+package fr.rewrite.server.infrastructure.poc;
 
-import fr.rewrite.server.application.dto.PlatformConfig;
-import fr.rewrite.server.application.dto.PullRequestDetails;
 import fr.rewrite.server.domain.exception.GitOperationException;
 import fr.rewrite.server.domain.spi.PullRequestServicePort;
+import fr.rewrite.server.poc.application.dto.PlatformConfig;
+import fr.rewrite.server.poc.application.dto.PullRequestDetails;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,7 +18,7 @@ public class GitHubApiAdapter implements PullRequestServicePort {
     this.httpClient = httpClient;
   }
 
-  @Override
+  //  @Override
   public void createPullRequest(PullRequestDetails details, PlatformConfig config) throws GitOperationException {
     String endpointUrl = String.format("%s/repos/%s/%s/pulls", config.apiBaseUrl(), config.repoOwner(), config.repoName());
     String requestBody = String.format(

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 @UnitTest
-class RewriteBackCollectionsTest {
+class RewriteServerCollectionsTest {
 
   @Nested
   @DisplayName("Collections")
@@ -18,7 +18,7 @@ class RewriteBackCollectionsTest {
     @Test
     void shouldGetEmptyImmutableCollectionFromNullCollection() {
       Collection<Object> input = null;
-      Collection<Object> collection = RewriteBackCollections.immutable(input);
+      Collection<Object> collection = RewriteServerCollections.immutable(input);
 
       assertThat(collection).isEmpty();
       assertThatThrownBy(collection::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -28,7 +28,7 @@ class RewriteBackCollectionsTest {
     void shouldGetImmutableCollectionFromMutableCollection() {
       Collection<String> input = new ArrayList<>();
       input.add("value");
-      Collection<String> collection = RewriteBackCollections.immutable(input);
+      Collection<String> collection = RewriteServerCollections.immutable(input);
 
       assertThat(collection).containsExactly("value");
       assertThatThrownBy(collection::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -42,7 +42,7 @@ class RewriteBackCollectionsTest {
     @Test
     void shouldGetEmptyImmutableCollectionFromNullCollection() {
       Set<Object> input = null;
-      Set<Object> set = RewriteBackCollections.immutable(input);
+      Set<Object> set = RewriteServerCollections.immutable(input);
 
       assertThat(set).isEmpty();
       assertThatThrownBy(set::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -52,7 +52,7 @@ class RewriteBackCollectionsTest {
     void shouldGetImmutableCollectionFromMutableCollection() {
       Set<String> input = new HashSet<>();
       input.add("value");
-      Set<String> set = RewriteBackCollections.immutable(input);
+      Set<String> set = RewriteServerCollections.immutable(input);
 
       assertThat(set).containsExactly("value");
       assertThatThrownBy(set::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -66,7 +66,7 @@ class RewriteBackCollectionsTest {
     @Test
     void shouldGetEmptyImmutableCollectionFromNullCollection() {
       List<Object> input = null;
-      List<Object> list = RewriteBackCollections.immutable(input);
+      List<Object> list = RewriteServerCollections.immutable(input);
 
       assertThat(list).isEmpty();
       assertThatThrownBy(list::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -76,7 +76,7 @@ class RewriteBackCollectionsTest {
     void shouldGetImmutableCollectionFromMutableCollection() {
       List<String> input = new ArrayList<>();
       input.add("value");
-      List<String> list = RewriteBackCollections.immutable(input);
+      List<String> list = RewriteServerCollections.immutable(input);
 
       assertThat(list).containsExactly("value");
       assertThatThrownBy(list::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -90,7 +90,7 @@ class RewriteBackCollectionsTest {
     @Test
     void shouldGetEmptyImmutableMapFromNullMap() {
       Map<Object, Object> input = null;
-      Map<Object, Object> map = RewriteBackCollections.immutable(input);
+      Map<Object, Object> map = RewriteServerCollections.immutable(input);
 
       assertThat(map).isEmpty();
       assertThatThrownBy(map::clear).isExactlyInstanceOf(UnsupportedOperationException.class);
@@ -100,7 +100,7 @@ class RewriteBackCollectionsTest {
     void shouldGetImmutableMapFromMutableMap() {
       Map<String, String> input = new HashMap<>();
       input.put("key", "value");
-      Map<String, String> map = RewriteBackCollections.immutable(input);
+      Map<String, String> map = RewriteServerCollections.immutable(input);
 
       assertThat(map).containsExactly(Map.entry("key", "value"));
       assertThatThrownBy(map::clear).isExactlyInstanceOf(UnsupportedOperationException.class);

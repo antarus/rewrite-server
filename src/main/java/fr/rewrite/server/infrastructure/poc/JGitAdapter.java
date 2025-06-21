@@ -1,8 +1,8 @@
-package fr.rewrite.server.infrastructure.secondary.git;
+package fr.rewrite.server.infrastructure.poc;
 
-import fr.rewrite.server.application.dto.Credentials;
 import fr.rewrite.server.domain.exception.GitOperationException;
 import fr.rewrite.server.domain.spi.GitRepositoryPort;
+import fr.rewrite.server.poc.application.dto.Credentials;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 public class JGitAdapter implements GitRepositoryPort {
 
-  @Override
+  //  @Override
   public void cloneRepository(String repoUrl, Path localPath, Credentials credentials)
     throws fr.rewrite.server.domain.exception.GitOperationException {
     try {
@@ -63,7 +63,7 @@ public class JGitAdapter implements GitRepositoryPort {
     }
   }
 
-  @Override
+  //  @Override
   public void pushBranch(Path repoPath, String branchName, Credentials credentials) throws GitOperationException {
     try (Git git = Git.open(repoPath.toFile())) {
       CredentialsProvider cp = new UsernamePasswordCredentialsProvider(credentials.username(), credentials.pat());

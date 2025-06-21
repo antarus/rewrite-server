@@ -1,21 +1,17 @@
-package fr.rewrite.server.infrastructure.secondary.rewrite;
+package fr.rewrite.server.infrastructure.poc;
 
 import fr.rewrite.server.domain.spi.RewriteEnginePort;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.LargeSourceSet;
-import org.openrewrite.Recipe;
-import org.openrewrite.Result;
-import org.openrewrite.SourceFile;
+import org.openrewrite.*;
 import org.openrewrite.internal.InMemoryLargeSourceSet;
 import org.openrewrite.java.JavaParser;
 
 public class OpenRewriteAdapter implements RewriteEnginePort {
 
-  @Override
+  //  @Override
   public List<SourceFile> parseSources(List<Path> sourcePaths, Path baseDir, Set<Path> classpath, ExecutionContext executionContext) {
     JavaParser javaParser = JavaParser.fromJavaVersion().classpath(classpath).build();
 
@@ -34,7 +30,7 @@ public class OpenRewriteAdapter implements RewriteEnginePort {
     return parsedSources;
   }
 
-  @Override
+  //  @Override
   public List<Result> runRecipes(List<SourceFile> parsedSources, String recipeName, ExecutionContext executionContext) {
     try {
       // Instancier la recette dynamiquement par son nom

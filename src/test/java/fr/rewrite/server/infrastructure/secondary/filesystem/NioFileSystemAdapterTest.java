@@ -9,6 +9,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import org.slf4j.LoggerFactory;
 
+@UnitTest
 class NioFileSystemAdapterTest {
 
   private NioFileSystemAdapter nioFileSystemAdapter;

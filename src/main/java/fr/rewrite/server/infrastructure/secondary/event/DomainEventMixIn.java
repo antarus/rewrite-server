@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.events.RepositoryCreatedEvent;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonSubTypes(
   {
     @JsonSubTypes.Type(value = RepositoryCreatedEvent.class), @JsonSubTypes.Type(value = LoggingEvent.class),

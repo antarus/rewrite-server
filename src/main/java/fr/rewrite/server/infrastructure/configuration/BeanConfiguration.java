@@ -12,23 +12,14 @@ import fr.rewrite.server.domain.RewriteConfig;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
 import fr.rewrite.server.domain.spi.*;
-import fr.rewrite.server.infrastructure.secondary.api.GitHubApiAdapter;
-import fr.rewrite.server.infrastructure.secondary.api.GitLabApiAdapter;
-import fr.rewrite.server.infrastructure.secondary.buildtool.MavenBuildToolAdapter;
+import fr.rewrite.server.infrastructure.poc.*;
 import fr.rewrite.server.infrastructure.secondary.event.DomainEventMixIn;
 import fr.rewrite.server.infrastructure.secondary.event.EventServiceAdapter;
 import fr.rewrite.server.infrastructure.secondary.event.InMemoryEventBusAdapter;
 import fr.rewrite.server.infrastructure.secondary.filesystem.JsonFileSystemRepository;
-import fr.rewrite.server.infrastructure.secondary.git.JGitAdapter;
-import fr.rewrite.server.infrastructure.secondary.rewrite.OpenRewriteAdapter;
+import fr.rewrite.server.poc.application.RewriteOrchestrator;
 import java.net.http.HttpClient;
-import javax.sql.DataSource;
-import org.jobrunr.configuration.JobRunr;
-import org.jobrunr.scheduling.JobScheduler;
-import org.jobrunr.server.JobActivator;
-import org.jobrunr.storage.sql.common.SqlStorageProviderFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -129,7 +120,7 @@ public class BeanConfiguration {
   // Son nom de bean par défaut sera "platformServiceSelector" (nom de classe en camelCase).
 
   @Bean
-  public fr.rewrite.server.application.RewriteOrchestrator rewriteOrchestrator(
+  public RewriteOrchestrator rewriteOrchestrator(
     GitRepositoryPort gitRepositoryPort,
     BuildToolPort buildToolPort,
     RewriteEnginePort rewriteEnginePort,
@@ -137,12 +128,6 @@ public class BeanConfiguration {
     // NOUVEAU : Utilisez @Qualifier pour spécifier quel bean de type PullRequestServicePort injecter
     @Qualifier("platformServiceSelector") PullRequestServicePort pullRequestServicePort // Renommé pour plus de clarté
   ) {
-    return new fr.rewrite.server.application.RewriteOrchestrator(
-      gitRepositoryPort,
-      buildToolPort,
-      rewriteEnginePort,
-      fileSystemPort,
-      pullRequestServicePort
-    );
+    return new RewriteOrchestrator(gitRepositoryPort, buildToolPort, rewriteEnginePort, fileSystemPort, pullRequestServicePort);
   }
 }

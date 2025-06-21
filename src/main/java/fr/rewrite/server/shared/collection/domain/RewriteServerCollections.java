@@ -5,9 +5,9 @@ import java.util.*;
 /**
  * Null safe utility class to manage collections
  */
-public final class RewriteBackCollections {
+public final class RewriteServerCollections {
 
-  private RewriteBackCollections() {}
+  private RewriteServerCollections() {}
 
   /**
    * Get an immutable collection from the given collection

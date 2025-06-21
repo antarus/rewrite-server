@@ -8,6 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import fr.rewrite.server.UnitTest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.LoggerFactory;
 
+@UnitTest
 class DomainEventHandlerServiceTest {
 
   private DomainEventHandlerService domainEventHandlerService;

@@ -1,4 +1,4 @@
-package fr.rewrite.server;
+package fr.rewrite.server.poc;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.Recipe;
-// Changement ici : import de Recipe
-//import org.openrewrite.RecipeDescriptor;
 import org.openrewrite.config.Environment;
 import org.openrewrite.config.OptionDescriptor;
 import org.openrewrite.config.RecipeDescriptor;

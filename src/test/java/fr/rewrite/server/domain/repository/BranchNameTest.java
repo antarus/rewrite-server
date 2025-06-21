@@ -2,6 +2,7 @@ package fr.rewrite.server.domain.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@UnitTest
 class BranchNameTest {
 
   @Test

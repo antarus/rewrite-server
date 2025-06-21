@@ -1,11 +1,9 @@
-package fr.rewrite.server.infrastructure.secondary;
+package fr.rewrite.server.infrastructure.poc;
 
-import fr.rewrite.server.application.dto.PlatformConfig;
-import fr.rewrite.server.application.dto.PullRequestDetails;
 import fr.rewrite.server.domain.exception.GitOperationException;
 import fr.rewrite.server.domain.spi.PullRequestServicePort;
-import fr.rewrite.server.infrastructure.poc.GitHubApiAdapter;
-import fr.rewrite.server.infrastructure.poc.GitLabApiAdapter;
+import fr.rewrite.server.poc.application.dto.PlatformConfig;
+import fr.rewrite.server.poc.application.dto.PullRequestDetails;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,7 @@ public class PlatformServiceSelector implements PullRequestServicePort {
     this.gitlabAdapter = gitlabAdapter;
   }
 
-  @Override
+  //  @Override
   public void createPullRequest(PullRequestDetails details, PlatformConfig config) throws GitOperationException {
     // MAINTENANT config.platform() existe bien
     if ("github".equalsIgnoreCase(config.platformType())) {

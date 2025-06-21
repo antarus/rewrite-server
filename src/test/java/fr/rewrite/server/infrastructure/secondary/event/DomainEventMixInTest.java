@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.events.AnotherTestEvent;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.TestEvent;
@@ -21,6 +22,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@UnitTest
 class DomainEventMixInTest {
 
   private static final Logger log = LoggerFactory.getLogger(DomainEventMixInTest.class);

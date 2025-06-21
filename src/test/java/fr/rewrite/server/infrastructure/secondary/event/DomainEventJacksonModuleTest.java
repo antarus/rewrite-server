@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.events.RepositoryCreatedEvent;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@UnitTest
 class DomainEventJacksonModuleTest {
 
   private ObjectMapper objectMapper;
@@ -39,7 +41,7 @@ class DomainEventJacksonModuleTest {
 
     System.out.println("Serialized RepositoryCreatedEvent:\n" + json);
 
-    assertThat(json).contains("\"@class\" : \"" + RepositoryCreatedEvent.class.getName() + "\"");
+    assertThat(json).contains("\"@type\" : \"" + RepositoryCreatedEvent.class.getSimpleName() + "\"");
     assertThat(json).contains("\"path\" : \"my-new-repo\"");
     assertThat(json).contains("eventId");
     assertThat(json).contains("occurredOn");
@@ -54,7 +56,7 @@ class DomainEventJacksonModuleTest {
 
     System.out.println("Serialized LoggingEvent:\n" + json);
 
-    assertThat(json).contains("\"@class\" : \"" + LoggingEvent.class.getName() + "\"");
+    assertThat(json).contains("\"@type\" : \"" + LoggingEvent.class.getSimpleName() + "\"");
     assertThat(json).contains("\"log\" : \"Application started.\"");
   }
 
@@ -63,8 +65,8 @@ class DomainEventJacksonModuleTest {
   void deserialization_shouldResolveRepositoryCreatedEvent() throws IOException {
     String json =
       "{\n" +
-      "  \"@class\" : \"" +
-      RepositoryCreatedEvent.class.getName() +
+      "  \"@type\" : \"" +
+      RepositoryCreatedEvent.class.getSimpleName() +
       "\",\n" +
       "  \"eventId\" : \"test-repo-id-123\",\n" +
       "  \"occurredOn\" : \"" +
@@ -88,8 +90,8 @@ class DomainEventJacksonModuleTest {
   void deserialization_shouldResolveLoggingEvent() throws IOException {
     String json =
       "{\n" +
-      "  \"@class\": \"" +
-      LoggingEvent.class.getName() +
+      "  \"@type\": \"" +
+      LoggingEvent.class.getSimpleName() +
       "\",\n" +
       "  \"eventId\": \"test-log-id-456\",\n" +
       "  \"occurredOn\": \"" +
@@ -110,10 +112,10 @@ class DomainEventJacksonModuleTest {
   @Test
   @DisplayName("Deserialization should fail for unknown subtype not in @JsonSubTypes")
   void deserialization_shouldFailForUnknownSubtype() {
-    String unknownEventClassName = "fr.rewrite.server.domain.events.UnknownExistEvent";
+    String unknownEventClassName = "UnknownExistEvent";
     String json =
       "{\n" +
-      "  \"@class\": \"" +
+      "  \"@type\": \"" +
       unknownEventClassName +
       "\",\n" +
       "  \"eventId\": \"unknown-id\",\n" +

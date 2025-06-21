@@ -1,8 +1,6 @@
-package fr.rewrite.server.application.dto;
+package fr.rewrite.server.poc.application.dto;
 
-import java.nio.file.Path;
 import java.util.List;
-import org.openrewrite.ExecutionContext;
 
 public record RewriteConfig(
   String repoUrl,

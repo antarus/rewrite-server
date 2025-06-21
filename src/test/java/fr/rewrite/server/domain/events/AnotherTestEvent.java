@@ -1,8 +1,10 @@
 package fr.rewrite.server.domain.events;
 
+import fr.rewrite.server.UnitTest;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@UnitTest
 public class AnotherTestEvent implements DomainEvent {
 
   private final String eventId;

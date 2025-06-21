@@ -1,4 +1,4 @@
-package fr.rewrite.server.infrastructure.secondary.buildtool;
+package fr.rewrite.server.infrastructure.poc;
 
 import fr.rewrite.server.domain.exception.BuildToolException;
 import fr.rewrite.server.domain.spi.BuildToolPort;

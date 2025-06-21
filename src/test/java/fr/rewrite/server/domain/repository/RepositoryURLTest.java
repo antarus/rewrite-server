@@ -2,6 +2,7 @@ package fr.rewrite.server.domain.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.exception.RewriteException;
 import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@UnitTest
 public class RepositoryURLTest {
 
   @Test

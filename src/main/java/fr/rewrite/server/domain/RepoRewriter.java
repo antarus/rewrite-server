@@ -1,14 +1,11 @@
 package fr.rewrite.server.domain;
 
 import fr.rewrite.server.domain.ddd.DomainService;
-import fr.rewrite.server.domain.events.RepositoryCreatedEvent;
-import fr.rewrite.server.domain.exception.RewriteException;
 import fr.rewrite.server.domain.feature.RewriteARepo;
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.domain.spi.DataRepository;
 import fr.rewrite.server.domain.spi.EventBusPort;
 import fr.rewrite.server.domain.spi.JobPort;
-import fr.rewrite.server.domain.spi.JobSchedulerPort;
 import fr.rewrite.server.shared.error.domain.Assert;
 import java.util.Optional;
 
@@ -21,11 +18,7 @@ public class RepoRewriter implements RewriteARepo {
 
   private final DataRepository dataRepository;
 
-  public RepoRewriter(
-    RewriteConfig rewriteConfig,JobPort jobPort,
-    EventBusPort eventBus,
-    DataRepository dataRepository
-  ) {
+  public RepoRewriter(RewriteConfig rewriteConfig, JobPort jobPort, EventBusPort eventBus, DataRepository dataRepository) {
     Assert.notNull("rewriteConfig", rewriteConfig);
     Assert.notNull("rewriteConfig", rewriteConfig);
     Assert.notNull("eventBus", eventBus);
@@ -44,10 +37,8 @@ public class RepoRewriter implements RewriteARepo {
     RewriteId rewriteId = RewriteId.fromString(repositoryURL.get());
     Optional<State> optState = dataRepository.get(rewriteId);
     if (optState.isEmpty()) {
-      dataRepository.save( State.init(rewriteId));
+      dataRepository.save(State.init(rewriteId));
       jobPort.createDatastoreJob(rewriteId);
-    }else{
-      throw  RewriteException.conflict()
     }
 
     return rewriteId;
