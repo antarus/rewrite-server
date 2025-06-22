@@ -3,20 +3,19 @@ package fr.rewrite.server.poc.application;
 import static java.util.Objects.requireNonNull;
 
 import fr.rewrite.server.domain.Job;
-import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.DatastorePort;
 import fr.rewrite.server.domain.exception.BuildToolException;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import fr.rewrite.server.domain.exception.GitOperationException;
+import fr.rewrite.server.domain.repository.RepositoryPort;
 import fr.rewrite.server.domain.spi.*;
 import fr.rewrite.server.poc.application.dto.RewriteConfig;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RewriteOrchestrator {
 
-  private final GitRepositoryPort gitRepositoryPort;
+  private final RepositoryPort gitRepositoryPort;
   private final BuildToolPort buildToolPort;
   private final RewriteEnginePort rewriteEnginePort;
   private final DatastorePort fileSystemPort;
@@ -38,7 +37,7 @@ public class RewriteOrchestrator {
   // Pas de JobService ici pour le moment. Il sera injecté dans le Tasklet.
   // L'orchestrateur recevra le JobService en paramètre de sa méthode.
   public RewriteOrchestrator(
-    GitRepositoryPort gitRepositoryPort,
+    RepositoryPort gitRepositoryPort,
     BuildToolPort buildToolPort,
     RewriteEnginePort rewriteEnginePort,
     DatastorePort fileSystemPort,
@@ -61,7 +60,7 @@ public class RewriteOrchestrator {
     requireNonNull(config.gitPatForGit(), "Git PAT for Git must not be null");
     requireNonNull(config.gitPatForApi(), "Git PAT for API must not be null");
 
-    RewriteId id = RewriteId.fromString(config.repoUrl());
+    //    RewriteId id = RewriteId.from(config.repoUrl());
 
     //create datastore
     //clone repository
@@ -76,21 +75,21 @@ public class RewriteOrchestrator {
     Path workDir = Paths.get(baseWorkDirectory, "job-" + jobId); // Nom de répertoire spécifique au job
 
     try {
-      fileSystemPort.createDatastore(Paths.get(baseWorkDirectory));
-      fileSystemPort.createDatastore(workDir);
+      //      fileSystemPort.createDatastore(Paths.get(baseWorkDirectory));
+      //      fileSystemPort.createDatastore(workDir);
       jobService.updateJobStatus(jobId, Job.Status.RUNNING, "Server work directory created: " + workDir, null, null);
       System.out.println("Processing repository for job " + jobId + " in: " + workDir);
 
       // 2. Cloner le dépôt
       jobService.updateJobStatus(jobId, Job.Status.RUNNING, "Cloning repository...", null, null);
       System.out.println("Cloning repository " + config.repoUrl() + " into " + workDir);
-      //      gitRepositoryPort.cloneRepository(config.repoUrl(), workDir, new Credentials(config.gitUsername(), config.gitPatForGit()));
+      //            gitRepositoryPort.cloneRepository(config.repoUrl(), workDir, new Credentials(config.gitUsername(), config.gitPatForGit()));
 
       // 3. Créer et checkout la nouvelle branche
       String branchName = "rewrite-changes-" + UUID.randomUUID().toString().substring(0, 8);
       jobService.updateJobStatus(jobId, Job.Status.RUNNING, "Creating new branch: " + branchName, null, null);
       System.out.println("Creating new branch: " + branchName);
-      gitRepositoryPort.createAndCheckoutBranch(workDir, branchName);
+      //      gitRepositoryPort.createAndCheckoutBranch(workDir, branchName);
 
       // 4. Exécuter le build tool (Maven)
       jobService.updateJobStatus(jobId, Job.Status.RUNNING, "Executing build tool...", null, null);
@@ -99,12 +98,12 @@ public class RewriteOrchestrator {
 
       // 5. Récupérer les chemins des sources et le classpath
       jobService.updateJobStatus(jobId, Job.Status.RUNNING, "Parsing source paths...", null, null);
-      Set<Path> sourceFiles = fileSystemPort.listAllFiles(workDir);
-      List<Path> sourcePaths = sourceFiles
-        .stream()
-        .filter(p -> config.sourceExcludePatterns().stream().noneMatch(p.toString()::contains))
-        .collect(Collectors.toList());
-      System.out.println("Source paths to parse: " + sourcePaths.size() + " files.");
+      //      Set<Path> sourceFiles = fileSystemPort.listAllFiles(RewriteId.from("dddd"));
+      //      List<Path> sourcePaths = sourceFiles
+      //        .stream()
+      //        .filter(p -> config.sourceExcludePatterns().stream().noneMatch(p.toString()::contains))
+      //        .collect(Collectors.toList());
+      //      System.out.println("Source paths to parse: " + sourcePaths.size() + " files.");
 
       Path classpathFile = workDir.resolve("classpath.txt");
       Set<Path> classpath = buildToolPort.getProjectClasspath(workDir, classpathFile, config.mavenExecutablePath());

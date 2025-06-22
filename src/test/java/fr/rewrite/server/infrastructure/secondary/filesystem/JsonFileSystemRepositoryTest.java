@@ -13,12 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.RewriteConfig;
 import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.State;
-import fr.rewrite.server.domain.StateEnum;
 import fr.rewrite.server.domain.exception.DataAccessException;
-import fr.rewrite.server.domain.exception.RewriteException;
+import fr.rewrite.server.domain.state.RewriteConfig;
+import fr.rewrite.server.domain.state.State;
+import fr.rewrite.server.domain.state.StateEnum;
 import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -105,7 +104,7 @@ class JsonFileSystemRepositoryTest {
 
     RewriteConfig invalidConfig = new RewriteConfig(invalidConfigPath, tempWorkDirectory);
 
-    RewriteException thrown = assertThrows(RewriteException.class, () -> {
+    RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
       new JsonFileSystemRepository(invalidConfig);
     });
     assertThat(thrown.getMessage()).contains("Error when initilize base directory in JsonFileSystemRepository");

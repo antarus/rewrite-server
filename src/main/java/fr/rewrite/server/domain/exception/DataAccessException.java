@@ -1,12 +1,9 @@
 package fr.rewrite.server.domain.exception;
 
-public class DataAccessException extends RewriteException {
-
-  public DataAccessException(String message) {
-    super(badRequestBuilder(message));
-  }
+@Deprecated
+public class DataAccessException extends RuntimeException {
 
   public DataAccessException(String message, Throwable cause) {
-    super(badRequestBuilder(message).cause(cause));
+    super(message, cause);
   }
 }

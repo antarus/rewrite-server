@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -29,14 +30,14 @@ class RewriteIdTest {
 
   @Test
   @DisplayName("fromString should return a RewriteId with a deterministic UUID for the same input string")
-  void fromString_shouldBeDeterministic() {
-    String inputString1 = "https://github.com/my-org/repo-project-alpha";
-    String inputString2 = "https://github.com/my-org/repo-project-alpha";
-    String inputString3 = "https://github.com/another-org/another-repo";
+  void from_shouldBeDeterministic() {
+    RepositoryURL repositoryURL1 = RepositoryURL.from("https://github.com/my-org/repo-project-alpha");
+    RepositoryURL repositoryURL2 = RepositoryURL.from("https://github.com/my-org/repo-project-alpha");
+    RepositoryURL repositoryURL3 = RepositoryURL.from("https://github.com/another-org/another-repo");
 
-    RewriteId id1 = RewriteId.fromString(inputString1);
-    RewriteId id2 = RewriteId.fromString(inputString2);
-    RewriteId id3 = RewriteId.fromString(inputString3);
+    RewriteId id1 = RewriteId.from(repositoryURL1);
+    RewriteId id2 = RewriteId.from(repositoryURL2);
+    RewriteId id3 = RewriteId.from(repositoryURL3);
 
     assertThat(id1.get()).isEqualTo(id2.get());
     assertThat(id1).isEqualTo(id2);
@@ -46,34 +47,15 @@ class RewriteIdTest {
   }
 
   @Test
-  @DisplayName("fromString should return a valid UUID that can be re-parsed")
-  void fromString_shouldReturnValidUuid() {
-    String inputString = "some-unique-repository-name-or-url-12345";
-    RewriteId rewriteId = RewriteId.fromString(inputString);
-
-    assertThat(rewriteId).isNotNull();
-    UUID generatedUuid = rewriteId.get();
-    assertThat(generatedUuid).isNotNull();
-
-    assertThat(UUID.fromString(generatedUuid.toString())).isEqualTo(generatedUuid);
+  @DisplayName("fromString should throw MissingMandatoryValueException when input string is null")
+  void from_shouldThrowMissingMandatoryValueException_whenInputIsNull_RepositoryUrl() {
+    assertThrows(MissingMandatoryValueException.class, () -> RewriteId.from((RepositoryURL) null));
   }
 
   @Test
   @DisplayName("fromString should throw MissingMandatoryValueException when input string is null")
-  void fromString_shouldThrowMissingMandatoryValueException_whenInputIsNull() {
-    assertThrows(MissingMandatoryValueException.class, () -> RewriteId.fromString(null));
-  }
-
-  @Test
-  @DisplayName("fromString should throw MissingMandatoryValueException when input string is empty")
-  void fromString_shouldThrowMissingMandatoryValueException_whenInputIsEmpty() {
-    assertThrows(MissingMandatoryValueException.class, () -> RewriteId.fromString(""));
-  }
-
-  @Test
-  @DisplayName("fromString should throw MissingMandatoryValueException when input string is blank")
-  void fromString_shouldThrowMissingMandatoryValueException_whenInputIsBlank() {
-    assertThrows(MissingMandatoryValueException.class, () -> RewriteId.fromString("   \t\n"));
+  void from_shouldThrowMissingMandatoryValueException_whenInputIsNull_UUID() {
+    assertThrows(MissingMandatoryValueException.class, () -> RewriteId.from((UUID) null));
   }
 
   @Test

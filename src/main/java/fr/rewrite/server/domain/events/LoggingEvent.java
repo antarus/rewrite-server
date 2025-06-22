@@ -2,14 +2,15 @@ package fr.rewrite.server.domain.events;
 
 import static fr.rewrite.server.domain.events.LoggingEvent.LoggingEventBuilder.aLoggingEventEvent;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record LoggingEvent(String eventId, LocalDateTime occurredOn, String log) implements DomainEvent {
+public record LoggingEvent(UUID eventId, Instant occurredOn, String log) implements DomainEvent {
   protected static final class LoggingEventBuilder {
 
-    private String eventId;
-    private LocalDateTime occurredOn;
+    private UUID eventId;
+    private Instant occurredOn;
     private String log;
 
     private LoggingEventBuilder() {}
@@ -20,10 +21,10 @@ public record LoggingEvent(String eventId, LocalDateTime occurredOn, String log)
 
     LoggingEvent build() {
       if (this.eventId == null) {
-        eventId = UUID.randomUUID().toString();
+        eventId = UUID.randomUUID();
       }
       if (this.occurredOn == null) {
-        occurredOn = LocalDateTime.now();
+        occurredOn = Instant.now();
       }
       return new LoggingEvent(eventId, occurredOn, log);
     }

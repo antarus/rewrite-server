@@ -1,9 +1,10 @@
 package fr.rewrite.server.domain.events;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public interface DomainEvent extends Serializable {
-  String eventId();
-  LocalDateTime occurredOn();
+  UUID eventId();
+  Instant occurredOn();
 }

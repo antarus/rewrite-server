@@ -5,9 +5,9 @@ import java.util.List;
 public record RewriteConfig(
   String repoUrl,
   String recipeName,
-  String gitUsername, // <-- NOUVEL ATTRIBUT
-  String gitPatForGit, // <-- NOUVEL ATTRIBUT
-  String gitPatForApi, // <-- NOUVEL ATTRIBUT
+  String gitUsername,
+  String gitPatForGit,
+  String gitPatForApi,
   String platform,
   String baseBranch,
   String mavenExecutablePath,

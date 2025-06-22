@@ -1,0 +1,19 @@
+package fr.rewrite.server.domain.datastore;
+
+import fr.rewrite.server.shared.error.domain.ErrorKey;
+
+public enum DatastoreErrorKey implements ErrorKey {
+  DATASTORE_ALREADY_EXIST("datastore-already-exist"),
+  DATASTORE_NOT_FOUND("datastore-not-found");
+
+  private final String key;
+
+  DatastoreErrorKey(String key) {
+    this.key = key;
+  }
+
+  @Override
+  public String get() {
+    return key;
+  }
+}

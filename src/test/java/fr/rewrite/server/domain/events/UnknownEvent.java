@@ -1,5 +1,6 @@
 package fr.rewrite.server.domain.events;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
-public record UnknownEvent(String eventId, LocalDateTime occurredOn, String data) implements DomainEvent {}
+public record UnknownEvent(UUID eventId, Instant occurredOn, String data) implements DomainEvent {}

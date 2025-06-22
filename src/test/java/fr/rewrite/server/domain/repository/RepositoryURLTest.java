@@ -3,7 +3,6 @@ package fr.rewrite.server.domain.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.exception.RewriteException;
 import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -42,10 +41,16 @@ public class RepositoryURLTest {
     assertEquals(url, repoUrl.get());
   }
 
+  @Test
+  @DisplayName("Should throw MissingMandatoryValueException for null or empty URLs")
+  public void shouldThrowExceptionForNullUrls() {
+    assertThrows(MissingMandatoryValueException.class, () -> new RepositoryURL(null));
+  }
+
   @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = { " ", "\t", "\n" })
-  @DisplayName("Should throw IllegalArgumentException for null or empty URLs")
+  @DisplayName("Should throw MissingMandatoryValueException for null or empty URLs")
   void shouldThrowExceptionForNullOrEmptyUrls(String invalidUrl) {
     assertThrows(MissingMandatoryValueException.class, () -> new RepositoryURL(invalidUrl));
   }
@@ -54,9 +59,9 @@ public class RepositoryURLTest {
   @ValueSource(
     strings = { "http://invalid.url/path", "ftp://another.protocol.com/repo", "just_a_string", "https://not-github-gitlab.com/owner/repo" }
   )
-  @DisplayName("Should throw IllegalArgumentException for invalid format URLs")
+  @DisplayName("Should throw RewriteException for invalid format URLs")
   void shouldThrowExceptionForInvalidFormatUrls(String invalidUrl) {
-    assertThrows(RewriteException.class, () -> new RepositoryURL(invalidUrl));
+    assertThrows(RepositoryInvalidUrlException.class, () -> new RepositoryURL(invalidUrl));
   }
 
   @ParameterizedTest

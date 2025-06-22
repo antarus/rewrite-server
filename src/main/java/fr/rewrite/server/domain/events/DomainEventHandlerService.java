@@ -1,6 +1,7 @@
 package fr.rewrite.server.domain.events;
 
 import fr.rewrite.server.domain.ddd.DomainService;
+import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;

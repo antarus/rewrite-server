@@ -10,8 +10,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.DatastoreCreator;
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.DatastoreWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,7 @@ class JobQueueAdapterTest {
   private ListAppender<ILoggingEvent> listAppender;
   private Logger logger;
 
-  private DatastoreCreator mockDatastoreCreator;
+  private DatastoreWorker mockDatastoreCreator;
 
   @BeforeEach
   void setUp() {
@@ -43,7 +43,7 @@ class JobQueueAdapterTest {
     logger.addAppender(listAppender);
     logger.setLevel(Level.DEBUG);
 
-    mockDatastoreCreator = mock(DatastoreCreator.class);
+    mockDatastoreCreator = mock(DatastoreWorker.class);
     jobQueueAdapter = new JobQueueAdapter(mockDatastoreCreator);
 
     ReflectionTestUtils.setField(jobQueueAdapter, "poolSize", 1);

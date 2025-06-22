@@ -1,7 +1,9 @@
 package fr.rewrite.server.infrastructure.secondary.job;
 
-import fr.rewrite.server.domain.DatastoreCreator;
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.DatastoreWorker;
+import fr.rewrite.server.domain.repository.Credentials;
+import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.domain.spi.JobPort;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -9,6 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,15 +29,10 @@ public class JobQueueAdapter implements JobPort {
   private final BlockingQueue<Runnable> jobQueue = new LinkedBlockingQueue<>();
   private ExecutorService executorService;
   private volatile boolean running = true;
-  private final DatastoreCreator datastoreCreator;
+  private final DatastoreWorker datastoreWorker;
 
-  public JobQueueAdapter(DatastoreCreator datastoreCreator) {
-    this.datastoreCreator = datastoreCreator;
-  }
-
-  @Override
-  public void createDatastoreJob(RewriteId rewriteId) {
-    enqueueJob(() -> datastoreCreator.createADatastore(rewriteId));
+  public JobQueueAdapter(DatastoreWorker datastoreWorker) {
+    this.datastoreWorker = datastoreWorker;
   }
 
   @PostConstruct
@@ -91,5 +89,15 @@ public class JobQueueAdapter implements JobPort {
       Thread.currentThread().interrupt();
       log.warn("JobQueueAdapter shutdown interrupted: some tasks may not have completed.");
     }
+  }
+
+  @Override
+  public void createDatastoreJob(RewriteId rewriteId) {
+    enqueueJob(() -> datastoreWorker.createADatastore(rewriteId));
+  }
+
+  @Override
+  public void cloneRepository(RepositoryURL repositoryURL, Credentials credential) {
+    throw new NotImplementedException();
   }
 }

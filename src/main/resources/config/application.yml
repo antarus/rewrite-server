@@ -114,3 +114,6 @@ management:
     git:
       enabled: true
       mode: full
+
+developer:
+  mode: false

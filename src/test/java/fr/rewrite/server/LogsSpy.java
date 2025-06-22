@@ -18,7 +18,7 @@ public final class LogsSpy {
 
   void prepare() {
     appender = new ListAppender<>();
-    logger = (Logger) LoggerFactory.getLogger("fr.rewrite.back");
+    logger = (Logger) LoggerFactory.getLogger("fr.rewrite.server");
     logger.addAppender(appender);
     initialLevel = logger.getLevel();
     logger.setLevel(Level.TRACE);

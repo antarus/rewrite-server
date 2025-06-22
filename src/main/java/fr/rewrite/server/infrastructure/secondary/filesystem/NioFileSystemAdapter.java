@@ -1,7 +1,12 @@
 package fr.rewrite.server.infrastructure.secondary.filesystem;
 
+import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.Datastore;
+import fr.rewrite.server.domain.datastore.DatastoreNotFoundException;
+import fr.rewrite.server.domain.datastore.DatastorePort;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
-import fr.rewrite.server.domain.spi.DatastorePort;
+import fr.rewrite.server.domain.state.RewriteConfig;
+import fr.rewrite.server.shared.error.domain.Assert;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -18,29 +23,47 @@ import org.springframework.stereotype.Component;
 @Component
 public class NioFileSystemAdapter implements DatastorePort {
 
+  public static final String REWRITE_ID = "rewriteId";
   private static final Logger log = LoggerFactory.getLogger(NioFileSystemAdapter.class);
 
+  private final RewriteConfig rewriteConfig;
+
+  public NioFileSystemAdapter(RewriteConfig rewriteConfig) {
+    Assert.notNull("rewriteConfig", rewriteConfig);
+    this.rewriteConfig = rewriteConfig;
+  }
+
+  private Path getPathFromRewriteId(RewriteId rewriteId) {
+    Assert.notNull(REWRITE_ID, rewriteId);
+    return rewriteConfig.resolve(rewriteId);
+  }
+
   @Override
-  public void createDatastore(Path path) throws FileSystemOperationException { // Changement
-    log.debug("Creating datastore {}", path);
+  public void createDatastore(RewriteId rewriteId) throws FileSystemOperationException {
+    Assert.notNull(REWRITE_ID, rewriteId);
+    Path datastorePath = getPathFromRewriteId(rewriteId);
+    log.debug("Creating datastore {}", datastorePath);
 
     try {
-      Files.createDirectories(path);
-      log.info("Directory created: {}", path);
+      Files.createDirectories(datastorePath);
+      log.info("Directory created: {}", datastorePath);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to create datastore: " + path + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to create datastore: " + datastorePath + ". " + e.getMessage(), e);
     }
   }
 
   @Override
-  public void deleteDatastore(Path directory) throws FileSystemOperationException { // Changement
-    if (!Files.exists(directory)) {
-      log.warn("Datastore does not exist, skipping deletion: {}", directory);
+  public void deleteDatastore(RewriteId rewriteId) throws FileSystemOperationException {
+    Assert.notNull(REWRITE_ID, rewriteId);
+    Path datastorePath = getPathFromRewriteId(rewriteId);
+    if (!Files.exists(datastorePath)) {
+      log.warn("Datastore does not exist, skipping deletion: {}", datastorePath);
       return;
+      //TODO Exception
     }
     try {
       Files.walkFileTree(
-        directory,
+        datastorePath,
         new SimpleFileVisitor<>() {
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -55,21 +78,33 @@ public class NioFileSystemAdapter implements DatastorePort {
           }
         }
       );
-      log.info("Datastore deleted: {}", directory);
+      log.info("Datastore deleted: {}", datastorePath);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to delete Datastore: " + directory + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to delete Datastore: " + datastorePath + ". " + e.getMessage(), e);
     }
   }
 
   @Override
-  public Set<Path> listAllFiles(Path directory) throws FileSystemOperationException { // Changement
-    if (!Files.isDirectory(directory)) {
-      throw new FileSystemOperationException("Path must be a directory: " + directory); // Ou IllegalArgumentException si c'est une validation de paramètre
+  public Set<Path> listAllFiles(RewriteId rewriteId) throws FileSystemOperationException { // Changement
+    Assert.notNull(REWRITE_ID, rewriteId);
+    Path datastorePath = getPathFromRewriteId(rewriteId);
+    if (!Files.isDirectory(datastorePath)) {
+      throw new FileSystemOperationException("Path must be a directory: " + datastorePath); // Ou IllegalArgumentException si c'est une validation de paramètre
     }
-    try (Stream<Path> walk = Files.walk(directory)) {
+    try (Stream<Path> walk = Files.walk(datastorePath)) {
       return walk.filter(Files::isRegularFile).collect(Collectors.toSet());
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to list files in datastore: " + directory + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException("Failed to list files in datastore: " + datastorePath + ". " + e.getMessage(), e);
     }
+  }
+
+  @Override
+  public Datastore getDatastore(RewriteId rewriteId) {
+    Assert.notNull(REWRITE_ID, rewriteId);
+    Path datastorePath = getPathFromRewriteId(rewriteId);
+    if (!Files.exists(datastorePath)) {
+      throw new DatastoreNotFoundException(rewriteId);
+    }
+    return Datastore.from(rewriteId, rewriteConfig.resolve(rewriteId), listAllFiles(rewriteId));
   }
 }

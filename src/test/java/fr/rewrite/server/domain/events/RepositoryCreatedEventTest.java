@@ -3,6 +3,8 @@ package fr.rewrite.server.domain.events;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -25,17 +27,15 @@ public class RepositoryCreatedEventTest {
     RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
     assertThat(event).isNotNull();
     assertThat(event.eventId()).isNotNull();
-    assertThat(event.eventId()).isNotEmpty();
-    assertThat(UUID.fromString(event.eventId())).isNotNull();
   }
 
   @Test
   void from_shouldGenerateOccurredOnAutomatically() {
     String path = "/yet/another/repo";
-    LocalDateTime beforeCreation = LocalDateTime.now();
+    Instant beforeCreation = Instant.now();
     RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
 
-    LocalDateTime afterCreation = LocalDateTime.now();
+    Instant afterCreation = Instant.now();
 
     assertThat(event).isNotNull();
     assertThat(event.occurredOn()).isNotNull();
@@ -49,8 +49,8 @@ public class RepositoryCreatedEventTest {
     String path = "/test/immutable";
     RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
 
-    String initialEventId = event.eventId();
-    LocalDateTime initialOccurredOn = event.occurredOn();
+    UUID initialEventId = event.eventId();
+    Instant initialOccurredOn = event.occurredOn();
     RepositoryCreatedEvent anotherEvent = RepositoryCreatedEvent.from(path);
 
     assertThat(event.eventId()).isEqualTo(initialEventId);

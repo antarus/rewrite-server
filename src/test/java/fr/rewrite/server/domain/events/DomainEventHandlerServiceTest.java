@@ -9,6 +9,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +58,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleEvent_shouldLogInfo_whenNoHandlerRegistered() {
-    DomainEvent unknownEvent = new UnknownEvent("dd", LocalDateTime.now(), "dsd");
+    DomainEvent unknownEvent = new UnknownEvent(UUID.randomUUID(), Instant.now(), "dsd");
 
     domainEventHandlerService.handleEvent(unknownEvent);
 
@@ -72,7 +74,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleRepositoryCreatedEvent_shouldLogInfoWithEventPath() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID().toString(), LocalDateTime.now(), "/product/repo");
+    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/product/repo");
 
     doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
     domainEventHandlerService.handleEvent(event);
@@ -88,7 +90,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleEvent_shouldCallRepositoryCreatedEventHandler_whenRepositoryCreatedEvent() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID().toString(), LocalDateTime.now(), "/test/repo");
+    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/test/repo");
     doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
 
     Mockito.doAnswer(i -> {
@@ -106,7 +108,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleEvent_shouldCallLoggingEventHandler_whenLoggingEvent() {
-    LoggingEvent event = new LoggingEvent(UUID.randomUUID().toString(), LocalDateTime.now(), "Test log message");
+    LoggingEvent event = new LoggingEvent(UUID.randomUUID(), Instant.now(), "Test log message");
     doCallRealMethod().when(domainEventHandlerService).handleLoggingEvent(event);
 
     Mockito.doAnswer(i -> {
@@ -124,7 +126,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleEvent_shouldLogError_whenHandlerThrowsException() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID().toString(), LocalDateTime.now(), "/error/repo");
+    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/error/repo");
 
     doThrow(new RuntimeException("Simulated handler error")).when(mockRepositoryCreatedHandler).accept(event);
     domainEventHandlerService.registerHandler(RepositoryCreatedEvent.class, mockRepositoryCreatedHandler);
@@ -161,7 +163,7 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleLoggingEvent_shouldLogInfoWithLogMessage() {
-    LoggingEvent event = new LoggingEvent(UUID.randomUUID().toString(), LocalDateTime.now(), "User logged in successfully");
+    LoggingEvent event = new LoggingEvent(UUID.randomUUID(), Instant.now(), "User logged in successfully");
 
     doCallRealMethod().when(domainEventHandlerService).handleLoggingEvent(event);
 
