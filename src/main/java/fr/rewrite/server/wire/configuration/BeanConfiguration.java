@@ -1,21 +1,20 @@
 package fr.rewrite.server.wire.configuration;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.rewrite.server.domain.datastore.DatastorePort;
-import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
 import fr.rewrite.server.domain.repository.RepositoryPort;
-import fr.rewrite.server.domain.spi.*;
+import fr.rewrite.server.domain.spi.BuildToolPort;
+import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.spi.PullRequestServicePort;
+import fr.rewrite.server.domain.spi.RewriteEnginePort;
 import fr.rewrite.server.domain.state.RewriteConfig;
 import fr.rewrite.server.domain.state.StateRepository;
-import fr.rewrite.server.infrastructure.poc.*;
+import fr.rewrite.server.infrastructure.poc.GitHubApiAdapter;
+import fr.rewrite.server.infrastructure.poc.GitLabApiAdapter;
+import fr.rewrite.server.infrastructure.poc.MavenBuildToolAdapter;
+import fr.rewrite.server.infrastructure.poc.OpenRewriteAdapter;
 import fr.rewrite.server.infrastructure.secondary.event.EventServiceAdapter;
 import fr.rewrite.server.infrastructure.secondary.event.InMemoryEventBusAdapter;
 import fr.rewrite.server.infrastructure.secondary.filesystem.JsonFileSystemRepository;
@@ -37,17 +36,6 @@ class BeanConfiguration {
   public StateRepository stateRepository(RewriteConfig rewriteConfig) {
     return new JsonFileSystemRepository(rewriteConfig);
   }
-
-  //  @Bean
-  //  public JobScheduler initJobRunr(DataSource dataSource, JobActivator jobActivator) {
-  //    return JobRunr.configure()
-  //      .useJobActivator(jobActivator)
-  //      .useStorageProvider(SqlStorageProviderFactory.using(dataSource))
-  //      .useBackgroundJobServer()
-  ////      .useDashboard()
-  //      .initialize()
-  //      .getJobScheduler();
-  //  }
 
   @Bean
   @Primary
@@ -71,8 +59,8 @@ class BeanConfiguration {
   }
 
   @Bean
-  public RepositoryPort gitRepositoryPort() {
-    return new JGitAdapter();
+  public RepositoryPort gitRepositoryPort(RewriteConfig rewriteConfig) {
+    return new JGitAdapter(rewriteConfig);
   }
 
   @Bean

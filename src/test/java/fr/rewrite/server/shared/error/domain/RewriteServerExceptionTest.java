@@ -1,6 +1,7 @@
 package fr.rewrite.server.shared.error.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.shared.error.infrastructure.primary.RewriteServerExceptionFactory;

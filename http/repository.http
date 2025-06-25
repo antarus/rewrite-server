@@ -1,0 +1,12 @@
+// test valide
+POST https://{{host}}/api/rewrite/repository/clone
+Content-Type: application/json
+
+{ "url" : "https://github.com/antarus/jhipster-lite",
+"credential": {
+  "username": "antarus",
+  "pat": "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"
+}
+}
+###
+f

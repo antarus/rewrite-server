@@ -1,4 +1,4 @@
-package fr.rewrite.server.domain;
+package fr.rewrite.server.poc.application;
 
 import java.time.LocalDateTime;
 

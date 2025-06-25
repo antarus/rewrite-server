@@ -12,6 +12,7 @@ import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.datastore.DatastoreWorker;
+import fr.rewrite.server.domain.repository.RepositoryWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,8 @@ class JobQueueAdapterTest {
   private ListAppender<ILoggingEvent> listAppender;
   private Logger logger;
 
-  private DatastoreWorker mockDatastoreCreator;
+  private DatastoreWorker mockDatastoreWorker;
+  private RepositoryWorker mockRepositoryWorker;
 
   @BeforeEach
   void setUp() {
@@ -43,8 +45,9 @@ class JobQueueAdapterTest {
     logger.addAppender(listAppender);
     logger.setLevel(Level.DEBUG);
 
-    mockDatastoreCreator = mock(DatastoreWorker.class);
-    jobQueueAdapter = new JobQueueAdapter(mockDatastoreCreator);
+    mockDatastoreWorker = mock(DatastoreWorker.class);
+    mockRepositoryWorker = mock(RepositoryWorker.class);
+    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
 
     ReflectionTestUtils.setField(jobQueueAdapter, "poolSize", 1);
 
@@ -106,7 +109,7 @@ class JobQueueAdapterTest {
     }
     listAppender.list.clear();
 
-    jobQueueAdapter = new JobQueueAdapter(mockDatastoreCreator);
+    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
     ReflectionTestUtils.setField(jobQueueAdapter, "poolSize", 1);
 
     listAppender.list.clear();
@@ -134,7 +137,7 @@ class JobQueueAdapterTest {
       TimeUnit.MILLISECONDS.sleep(100);
       return null;
     })
-      .when(mockDatastoreCreator)
+      .when(mockDatastoreWorker)
       .createADatastore(rewriteId);
 
     jobQueueAdapter.createDatastoreJob(rewriteId);
@@ -201,7 +204,7 @@ class JobQueueAdapterTest {
 
   @Test
   void jobConsumer_shouldHandleInterruption() throws InterruptedException {
-    JobQueueAdapter testJobQueueAdapter = new JobQueueAdapter(mockDatastoreCreator);
+    JobQueueAdapter testJobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
     ReflectionTestUtils.setField(testJobQueueAdapter, "poolSize", 1);
 
     BlockingQueue<Runnable> mockJobQueue = mock(BlockingQueue.class);

@@ -3,9 +3,9 @@ package fr.rewrite.server.domain.events;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -14,26 +14,34 @@ import org.junit.jupiter.api.Test;
 public class RepositoryCreatedEventTest {
 
   @Test
-  void from_shouldCreateEventWithProvidedPath() {
-    String expectedPath = "/my/new/repo";
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from(expectedPath);
+  void from_shouldCreateEventWithDefaultValue() {
+    LoggingEvent event = LoggingEvent.from("test");
     assertThat(event).isNotNull();
-    assertThat(event.path()).isEqualTo(expectedPath);
+    assertThat(event.occurredOn()).isNotNull();
+    assertThat(event.eventId()).isNotNull();
+  }
+
+  @Test
+  void from_shouldCreateEventWithProvidedUuid() {
+    RewriteId rewriteId = RewriteId.from(UUID.fromString("80417389-6f94-485e-8a75-2f4e380e0404"));
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
+    assertThat(event).isNotNull();
+    assertThat(event.rewriteId()).isEqualTo(rewriteId.uuid());
   }
 
   @Test
   void from_shouldGenerateEventIdAutomatically() {
-    String path = "/another/repo";
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
+    RewriteId rewriteId = RewriteId.from(UUID.fromString("80417389-6f94-485e-8a75-2f4e380e0405"));
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
     assertThat(event).isNotNull();
     assertThat(event.eventId()).isNotNull();
   }
 
   @Test
   void from_shouldGenerateOccurredOnAutomatically() {
-    String path = "/yet/another/repo";
+    RewriteId rewriteId = RewriteId.from(UUID.fromString("80417389-6f94-485e-8a75-2f4e380e0405"));
     Instant beforeCreation = Instant.now();
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
 
     Instant afterCreation = Instant.now();
 
@@ -46,12 +54,12 @@ public class RepositoryCreatedEventTest {
 
   @Test
   void eventIdAndOccurredOnAreImmutableAfterCreation() {
-    String path = "/test/immutable";
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
+    RewriteId rewriteId = RewriteId.from(UUID.fromString("80417389-6f94-485e-8a75-2f4e380e0405"));
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
 
     UUID initialEventId = event.eventId();
     Instant initialOccurredOn = event.occurredOn();
-    RepositoryCreatedEvent anotherEvent = RepositoryCreatedEvent.from(path);
+    RepositoryClonedEvent anotherEvent = RepositoryClonedEvent.from(rewriteId);
 
     assertThat(event.eventId()).isEqualTo(initialEventId);
     assertThat(event.occurredOn()).isEqualTo(initialOccurredOn);
@@ -61,8 +69,8 @@ public class RepositoryCreatedEventTest {
 
   @Test
   void eventIsADomainEvent() {
-    String path = "/test/interface";
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from(path);
+    RewriteId rewriteId = RewriteId.from(UUID.fromString("80417389-6f94-485e-8a75-2f4e380e0405"));
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
     assertThat(event).isInstanceOf(DomainEvent.class);
   }
 }

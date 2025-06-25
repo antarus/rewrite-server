@@ -2,7 +2,6 @@ package fr.rewrite.server.domain.events;
 
 import fr.rewrite.server.UnitTest;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @UnitTest

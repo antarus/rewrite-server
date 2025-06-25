@@ -1,6 +1,6 @@
 package fr.rewrite.server;
 
-import static org.junit.platform.commons.util.AnnotationUtils.*;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
 
 import java.lang.reflect.Field;
 import java.util.function.Predicate;

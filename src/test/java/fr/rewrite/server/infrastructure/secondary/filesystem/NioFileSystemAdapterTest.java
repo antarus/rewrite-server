@@ -11,9 +11,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.Datastore;
+import fr.rewrite.server.domain.datastore.DatastoreNotFoundException;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.domain.state.RewriteConfig;
+import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -217,5 +220,71 @@ class NioFileSystemAdapterTest {
 
       assertThat(listAppender.list).isEmpty();
     }
+  }
+
+  @Test
+  void getDatastore_shouldReturnDatastore_whenPathExistsAndIsDirectory() throws IOException {
+    RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/get_datastore_success"));
+    Path datastorePath = tempWorkDirectory.resolve(rewriteId.get().toString());
+    Files.createDirectories(datastorePath);
+    Path file1 = Files.createFile(datastorePath.resolve("config.json"));
+    Path file2 = Files.createFile(datastorePath.resolve("data.txt"));
+    Datastore datastore = nioFileSystemAdapter.getDatastore(rewriteId);
+    assertThat(datastore).isNotNull();
+    assertThat(datastore.rewriteId()).isEqualTo(rewriteId);
+    assertThat(datastore.path()).isEqualTo(datastorePath);
+    assertThat(datastore.files()).containsExactlyInAnyOrder(file1, file2);
+
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void getDatastore_shouldThrowDatastoreNotFoundException_whenPathDoesNotExist() {
+    // Arrange
+    RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/not_found_datastorekkkk"));
+
+    assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId)).isInstanceOf(DatastoreNotFoundException.class);
+
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void getDatastore_shouldThrowDatastoreNotFoundException_whenPathExistsButIsNotDirectory() throws IOException {
+    RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/not_a_directory"));
+    Path fileInsteadOfDir = tempWorkDirectory.resolve(rewriteId.get().toString());
+    Files.createFile(fileInsteadOfDir); // Create a file instead of a directory
+
+    assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId))
+      .isInstanceOf(FileSystemOperationException.class)
+      .hasMessageContaining("Path must be a directory: " + fileInsteadOfDir);
+
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void getDatastore_shouldThrowMissingMandatoryValueException_whenRewriteIdIsNull() {
+    RewriteId nullRewriteId = null;
+
+    assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(nullRewriteId))
+      .isInstanceOf(MissingMandatoryValueException.class)
+      .hasMessageContaining(NioFileSystemAdapter.REWRITE_ID);
+  }
+
+  @Test
+  void getDatastore_shouldPropagateFileSystemOperationException_fromListAllFiles() throws IOException {
+    RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/list_error_during_get"));
+    Path datastorePath = tempWorkDirectory.resolve(rewriteId.get().toString());
+    Files.createDirectories(datastorePath);
+    try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+      mockedFiles.when(() -> Files.exists(datastorePath)).thenReturn(true);
+      mockedFiles.when(() -> Files.isDirectory(datastorePath)).thenReturn(true); // listAllFiles checks this
+      mockedFiles.when(() -> Files.walk(datastorePath)).thenThrow(new IOException("Simulated file read error"));
+
+      assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId))
+        .isInstanceOf(FileSystemOperationException.class)
+        .hasMessageContaining("Failed to list files in datastore: " + datastorePath)
+        .hasCauseInstanceOf(IOException.class);
+    }
+    assertThat(listAppender.list).isEmpty();
   }
 }

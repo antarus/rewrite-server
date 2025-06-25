@@ -2,7 +2,6 @@ package fr.rewrite.server.domain.datastore;
 
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.ddd.DomainService;
-import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.spi.EventBusPort;
 
 @DomainService

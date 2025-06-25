@@ -9,9 +9,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +31,7 @@ class DomainEventHandlerServiceTest {
   private Logger logger;
 
   @Mock
-  private Consumer<RepositoryCreatedEvent> mockRepositoryCreatedHandler;
+  private Consumer<RepositoryClonedEvent> mockRepositoryCreatedHandler;
 
   @BeforeEach
   void setUp() {
@@ -74,7 +73,11 @@ class DomainEventHandlerServiceTest {
 
   @Test
   void handleRepositoryCreatedEvent_shouldLogInfoWithEventPath() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/product/repo");
+    RepositoryClonedEvent event = new RepositoryClonedEvent(
+      UUID.randomUUID(),
+      Instant.now(),
+      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
+    );
 
     doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
     domainEventHandlerService.handleEvent(event);
@@ -84,13 +87,19 @@ class DomainEventHandlerServiceTest {
     assertThat(logs).hasSize(2);
     assertThat(logs.get(0).getLevel()).isEqualTo(Level.DEBUG);
     assertThat(logs.get(1).getLevel()).isEqualTo(Level.INFO);
-    assertThat(logs.get(1).getFormattedMessage()).contains("DomainEventHandlerService: Handling RepositoryCreatedEvent : " + event.path());
-    assertThat(logs.get(1).getArgumentArray()).containsExactly(event.path());
+    assertThat(logs.get(1).getFormattedMessage()).contains(
+      "DomainEventHandlerService: Handling RepositoryCreatedEvent : " + event.rewriteId()
+    );
+    assertThat(logs.get(1).getArgumentArray()).containsExactly(UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a"));
   }
 
   @Test
   void handleEvent_shouldCallRepositoryCreatedEventHandler_whenRepositoryCreatedEvent() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/test/repo");
+    RepositoryClonedEvent event = new RepositoryClonedEvent(
+      UUID.randomUUID(),
+      Instant.now(),
+      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
+    );
     doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
 
     Mockito.doAnswer(i -> {
@@ -121,15 +130,19 @@ class DomainEventHandlerServiceTest {
     domainEventHandlerService.handleEvent(event);
 
     verify(domainEventHandlerService, times(1)).handleLoggingEvent(event);
-    verify(domainEventHandlerService, never()).handleRepositoryCreatedEvent(any(RepositoryCreatedEvent.class));
+    verify(domainEventHandlerService, never()).handleRepositoryCreatedEvent(any(RepositoryClonedEvent.class));
   }
 
   @Test
   void handleEvent_shouldLogError_whenHandlerThrowsException() {
-    RepositoryCreatedEvent event = new RepositoryCreatedEvent(UUID.randomUUID(), Instant.now(), "/error/repo");
+    RepositoryClonedEvent event = new RepositoryClonedEvent(
+      UUID.randomUUID(),
+      Instant.now(),
+      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
+    );
 
     doThrow(new RuntimeException("Simulated handler error")).when(mockRepositoryCreatedHandler).accept(event);
-    domainEventHandlerService.registerHandler(RepositoryCreatedEvent.class, mockRepositoryCreatedHandler);
+    domainEventHandlerService.registerHandler(RepositoryClonedEvent.class, mockRepositoryCreatedHandler);
     domainEventHandlerService.handleEvent(event);
     verify(mockRepositoryCreatedHandler, times(1)).accept(event);
 
@@ -138,7 +151,7 @@ class DomainEventHandlerServiceTest {
     assertThat(logs.get(0).getLevel()).isEqualTo(Level.DEBUG);
     assertThat(logs.get(1).getLevel()).isEqualTo(Level.ERROR);
     assertThat(logs.get(1).getFormattedMessage()).containsPattern(
-      "Error processing event .+ of type RepositoryCreatedEvent : Simulated handler error"
+      "Error processing event .+ of type RepositoryClonedEvent : Simulated handler error"
     );
     assertThat(logs.get(1).getArgumentArray()).contains(event.eventId(), event.getClass().getSimpleName(), "Simulated handler error");
   }
@@ -153,7 +166,7 @@ class DomainEventHandlerServiceTest {
       @SuppressWarnings("unchecked")
       Map<Class<? extends DomainEvent>, ?> handlers = (Map<Class<? extends DomainEvent>, ?>) handlersField.get(domainEventHandlerService);
 
-      assertThat(handlers).containsKey(RepositoryCreatedEvent.class);
+      assertThat(handlers).containsKey(RepositoryClonedEvent.class);
       assertThat(handlers).containsKey(LoggingEvent.class);
       assertThat(handlers).hasSize(2);
     } catch (NoSuchFieldException | IllegalAccessException e) {

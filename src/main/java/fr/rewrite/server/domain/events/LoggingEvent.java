@@ -3,7 +3,6 @@ package fr.rewrite.server.domain.events;
 import static fr.rewrite.server.domain.events.LoggingEvent.LoggingEventBuilder.aLoggingEventEvent;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record LoggingEvent(UUID eventId, Instant occurredOn, String log) implements DomainEvent {

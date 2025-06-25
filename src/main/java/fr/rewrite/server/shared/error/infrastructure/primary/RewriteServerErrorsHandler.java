@@ -75,7 +75,7 @@ class RewriteServerErrorsHandler {
     messageTemplate = ArgumentsReplacer.replaceParameters(messageTemplate, exception.parameters());
     if (developerMode) {
       String rootCause = ExceptionUtils.getRootCause(exception).getMessage();
-      if (rootCause != null && !rootCause.equals(messageTemplate)) {
+      if (rootCause != null && !rootCause.equals(messageTemplate) && !"An error occurred".equals(rootCause)) {
         messageTemplate = messageTemplate + ", ROOT : " + ExceptionUtils.getRootCause(exception).getMessage();
       }
     }

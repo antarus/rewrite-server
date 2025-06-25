@@ -2,7 +2,6 @@ package fr.rewrite.server.poc.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.rewrite.server.domain.Job;
 import fr.rewrite.server.poc.application.dto.RewriteConfig;
 import java.util.Optional;
 import org.springframework.stereotype.Service;

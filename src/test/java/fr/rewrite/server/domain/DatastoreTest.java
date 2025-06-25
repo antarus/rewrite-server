@@ -1,7 +1,6 @@
 package fr.rewrite.server.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.datastore.Datastore;

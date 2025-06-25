@@ -1,6 +1,6 @@
 package fr.rewrite.server.domain.datastore;
 
-import fr.rewrite.server.domain.*;
+import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.ddd.DomainService;
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.domain.spi.JobPort;

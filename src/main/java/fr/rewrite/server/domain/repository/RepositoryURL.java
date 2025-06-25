@@ -15,6 +15,9 @@ public record RepositoryURL(String url) {
   private static final Pattern GIT_URL_PATTERN = Pattern.compile(
     "(?<host>(git@|https://)([\\w\\.@]+)(/|:))(?<owner>[\\w,\\-,\\_]+)/(?<repo>[\\w,\\-,\\_]+)(.git){0,1}((/){0,1})"
   );
+  public static final String REPO = "repo";
+  public static final String OWNER = "owner";
+
   public RepositoryURL {
     Assert.field("value", url).notBlank();
     if (!isValidUrl(url)) {
@@ -35,17 +38,17 @@ public record RepositoryURL(String url) {
   public String getOwnerName() {
     Matcher githubMatcher = GITHUB_URL_PATTERN.matcher(url);
     if (githubMatcher.matches()) {
-      return githubMatcher.group("owner");
+      return githubMatcher.group(OWNER);
     }
 
     Matcher gitlabMatcher = GITLAB_URL_PATTERN.matcher(url);
     if (gitlabMatcher.matches()) {
-      return gitlabMatcher.group("owner");
+      return gitlabMatcher.group(OWNER);
     }
 
     Matcher gitMatcher = GIT_URL_PATTERN.matcher(url);
     if (gitMatcher.matches()) {
-      return gitMatcher.group("owner");
+      return gitMatcher.group(OWNER);
     }
     return "";
   }
@@ -53,16 +56,16 @@ public record RepositoryURL(String url) {
   public String getRepositoryName() {
     Matcher githubMatcher = GITHUB_URL_PATTERN.matcher(url);
     if (githubMatcher.matches()) {
-      return githubMatcher.group("repo");
+      return githubMatcher.group(REPO);
     }
 
     Matcher gitlabMatcher = GITLAB_URL_PATTERN.matcher(url);
     if (gitlabMatcher.matches()) {
-      return gitlabMatcher.group("repo");
+      return gitlabMatcher.group(REPO);
     }
-    Matcher gitMatcher = GITLAB_URL_PATTERN.matcher(url);
+    Matcher gitMatcher = GIT_URL_PATTERN.matcher(url);
     if (gitMatcher.matches()) {
-      return gitMatcher.group("repo");
+      return gitMatcher.group(REPO);
     }
     return "";
   }

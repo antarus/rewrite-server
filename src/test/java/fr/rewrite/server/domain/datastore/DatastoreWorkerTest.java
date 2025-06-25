@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.spi.EventBusPort;
 import java.nio.file.Path;
 import java.util.Collections;

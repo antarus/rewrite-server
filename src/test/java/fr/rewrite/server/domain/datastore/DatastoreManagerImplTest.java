@@ -1,9 +1,5 @@
 package fr.rewrite.server.domain.datastore;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.spi.JobPort;
 import fr.rewrite.server.domain.state.RewriteConfig;

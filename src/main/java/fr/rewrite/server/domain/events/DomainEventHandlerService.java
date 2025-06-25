@@ -1,7 +1,7 @@
 package fr.rewrite.server.domain.events;
 
 import fr.rewrite.server.domain.ddd.DomainService;
-import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,7 +20,7 @@ public class DomainEventHandlerService {
   }
 
   private void initHandlers() {
-    registerHandler(RepositoryCreatedEvent.class, this::handleRepositoryCreatedEvent);
+    registerHandler(RepositoryClonedEvent.class, this::handleRepositoryCreatedEvent);
     registerHandler(LoggingEvent.class, this::handleLoggingEvent);
   }
 
@@ -38,7 +38,7 @@ public class DomainEventHandlerService {
         log.debug("DomainEventHandlerService: Dispatching event of type: {}", event.getClass().getSimpleName());
         handler.accept(event);
       } catch (Exception e) {
-        log.error("Error processing event {}  of type {} : {}", event.eventId(), event.getClass().getSimpleName(), e.getMessage());
+        log.error("Error processing event {} of type {} : {}", event.eventId(), event.getClass().getSimpleName(), e.getMessage());
         //TODO
       }
     } else {
@@ -46,8 +46,8 @@ public class DomainEventHandlerService {
     }
   }
 
-  void handleRepositoryCreatedEvent(RepositoryCreatedEvent event) {
-    log.info("DomainEventHandlerService: Handling RepositoryCreatedEvent : {}", event.path());
+  void handleRepositoryCreatedEvent(RepositoryClonedEvent event) {
+    log.info("DomainEventHandlerService: Handling RepositoryCreatedEvent : {}", event.rewriteId());
   }
 
   void handleLoggingEvent(LoggingEvent event) {

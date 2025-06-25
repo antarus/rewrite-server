@@ -3,7 +3,8 @@ package fr.rewrite.server.domain.repository;
 import fr.rewrite.server.shared.error.domain.ErrorKey;
 
 public enum RepositoryErrorKey implements ErrorKey {
-  REPOSITORY_INVALID_URI("repository-invalid-uri");
+  REPOSITORY_INVALID_URI("repository-invalid-uri"),
+  REPOSITORY_CLONE_ERROR("repository-clone-error");
 
   private final String key;
 

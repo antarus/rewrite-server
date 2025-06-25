@@ -49,6 +49,7 @@ public class NioFileSystemAdapter implements DatastorePort {
       log.info("Directory created: {}", datastorePath);
     } catch (IOException e) {
       throw new FileSystemOperationException("Failed to create datastore: " + datastorePath + ". " + e.getMessage(), e);
+      //TODO Exception
     }
   }
 
@@ -81,6 +82,7 @@ public class NioFileSystemAdapter implements DatastorePort {
       log.info("Datastore deleted: {}", datastorePath);
     } catch (IOException e) {
       throw new FileSystemOperationException("Failed to delete Datastore: " + datastorePath + ". " + e.getMessage(), e);
+      //TODO Exception
     }
   }
 
@@ -90,11 +92,13 @@ public class NioFileSystemAdapter implements DatastorePort {
     Path datastorePath = getPathFromRewriteId(rewriteId);
     if (!Files.isDirectory(datastorePath)) {
       throw new FileSystemOperationException("Path must be a directory: " + datastorePath); // Ou IllegalArgumentException si c'est une validation de paramètre
+      //TODO Exception
     }
     try (Stream<Path> walk = Files.walk(datastorePath)) {
       return walk.filter(Files::isRegularFile).collect(Collectors.toSet());
     } catch (IOException e) {
       throw new FileSystemOperationException("Failed to list files in datastore: " + datastorePath + ". " + e.getMessage(), e);
+      //TODO Exception
     }
   }
 

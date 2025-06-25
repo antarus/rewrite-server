@@ -15,6 +15,20 @@ public record RewriteConfig(Path configDirectory, Path workDirectory) {
     return workDirectory().resolve(rewriteId.get().toString());
   }
 
+  public String maskWorkdirectory(Path pathToSanitize) {
+    Assert.notNull("pathToSanitize", pathToSanitize);
+    Path normalizedOriginalPath = pathToSanitize.normalize();
+    Path normalizedWorkDirectory = workDirectory.normalize();
+
+    if (normalizedOriginalPath.startsWith(normalizedWorkDirectory)) {
+      Path relativePath = normalizedWorkDirectory.relativize(normalizedOriginalPath);
+      // Construire la chaîne masquée
+      return "[ *** ]/" + relativePath.toString().replace("\\", "/");
+    } else {
+      return normalizedOriginalPath.toString().replace("\\", "/");
+    }
+  }
+
   public static final class RewriteConfigBuilder {
 
     private Path configDirectory;

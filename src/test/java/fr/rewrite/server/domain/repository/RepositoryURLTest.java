@@ -87,10 +87,20 @@ public class RepositoryURLTest {
   public void shouldTestEqualityBasedOnValue() {
     RepositoryURL url1 = new RepositoryURL("https://github.com/owner/repo.git");
     RepositoryURL url2 = new RepositoryURL("https://github.com/owner/repo.git");
-    RepositoryURL url3 = new RepositoryURL("https://github.com/another/repo.git");
+    RepositoryURL url3 = new RepositoryURL("https://gitlab.com/beyondxscratch/hexagonal-architecture-java-springboot.git");
 
     assertEquals(url1, url2);
     assertNotEquals(url1, url3);
     assertEquals(url1.hashCode(), url2.hashCode());
+  }
+
+  @Test
+  @DisplayName("Should test RepositoryURL compatible with bitbucket")
+  public void shouldOkWithBitbucket() {
+    RepositoryURL url1 = new RepositoryURL("https://bitbucket.org/atlassian/pipelines-examples-rust.git");
+    assertNotNull(url1);
+    assertEquals("atlassian", url1.getOwnerName());
+    assertEquals("GIT", url1.getPlatform());
+    assertEquals("pipelines-examples-rust", url1.getRepositoryName());
   }
 }

@@ -1,6 +1,6 @@
 package fr.rewrite.server.shared.error.infrastructure.primary;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import fr.rewrite.server.UnitTest;
 import java.util.HashMap;

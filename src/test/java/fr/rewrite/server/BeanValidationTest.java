@@ -1,6 +1,6 @@
 package fr.rewrite.server;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

@@ -9,9 +9,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.events.DomainEvent;
 import fr.rewrite.server.domain.events.LoggingEvent;
-import fr.rewrite.server.domain.repository.RepositoryCreatedEvent;
+import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -37,14 +38,14 @@ class DomainEventJacksonModuleTest {
   @Test
   @DisplayName("Serialization should include @class property for RepositoryCreatedEvent")
   void serialization_shouldIncludeTypeInfoForRepositoryCreatedEvent() throws JsonProcessingException {
-    RepositoryCreatedEvent event = RepositoryCreatedEvent.from("my-new-repo");
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(RewriteId.from(UUID.fromString("72995000-df51-4fc8-ad40-28f29a1bf54d")));
 
     String json = objectMapper.writeValueAsString(event);
 
     System.out.println("Serialized RepositoryCreatedEvent:\n" + json);
 
-    assertThat(json).contains("\"@type\" : \"" + RepositoryCreatedEvent.class.getSimpleName() + "\"");
-    assertThat(json).contains("\"path\" : \"my-new-repo\"");
+    assertThat(json).contains("\"@type\" : \"" + RepositoryClonedEvent.class.getSimpleName() + "\"");
+    assertThat(json).contains("\"rewriteId\" : \"72995000-df51-4fc8-ad40-28f29a1bf54d\"");
     assertThat(json).contains("eventId");
     assertThat(json).contains("occurredOn");
   }
@@ -66,24 +67,22 @@ class DomainEventJacksonModuleTest {
   @DisplayName("Deserialization should correctly resolve RepositoryCreatedEvent by @class property")
   void deserialization_shouldResolveRepositoryCreatedEvent() throws IOException {
     String json =
-      "{\n" +
-      "  \"@type\" : \"" +
-      RepositoryCreatedEvent.class.getSimpleName() +
-      "\",\n" +
-      "  \"eventId\" : \"636e6725-1f9c-41cb-833f-b499326fa364\",\n" +
-      "  \"occurredOn\" : \"" +
-      Instant.now() +
-      "\",\n" +
-      "  \"path\" : \"deserialized-repo\"\n" +
-      "}";
+      """
+      {
+        "@type" : "%s",
+        "eventId" : "636e6725-1f9c-41cb-833f-b499326fa364",
+        "occurredOn" : "%s",
+        "eventId" : "636e6725-1f9c-41cb-833f-b499326fa361"
+      }
+      """.formatted(RepositoryClonedEvent.class.getSimpleName(), Instant.now());
 
     DomainEvent deserializedEvent = objectMapper.readValue(json, DomainEvent.class);
 
     assertNotNull(deserializedEvent);
-    assertThat(deserializedEvent).isInstanceOf(RepositoryCreatedEvent.class);
-    RepositoryCreatedEvent repoEvent = (RepositoryCreatedEvent) deserializedEvent;
+    assertThat(deserializedEvent).isInstanceOf(RepositoryClonedEvent.class);
+    RepositoryClonedEvent repoEvent = (RepositoryClonedEvent) deserializedEvent;
 
-    assertThat(repoEvent.eventId()).isEqualTo(UUID.fromString("636e6725-1f9c-41cb-833f-b499326fa364"));
+    assertThat(repoEvent.eventId()).isEqualTo(UUID.fromString("636e6725-1f9c-41cb-833f-b499326fa361"));
     assertThat(repoEvent.occurredOn()).isBeforeOrEqualTo(Instant.now());
   }
 
@@ -91,17 +90,14 @@ class DomainEventJacksonModuleTest {
   @DisplayName("Deserialization should correctly resolve LoggingEvent by @class property")
   void deserialization_shouldResolveLoggingEvent() throws IOException {
     String json =
-      "{\n" +
-      "  \"@type\": \"" +
-      LoggingEvent.class.getSimpleName() +
-      "\",\n" +
-      "  \"eventId\": \"af028d76-0330-46d8-969a-4f57346e104e\",\n" +
-      "  \"occurredOn\": \"" +
-      Instant.now().minusSeconds(10) +
-      "\",\n" +
-      "  \"log\": \"deserialized log message\"\n" +
-      "}";
-
+      """
+      {
+        "@type": "%s",
+        "eventId": "af028d76-0330-46d8-969a-4f57346e104e",
+        "occurredOn": "%s",
+        "log": "deserialized log message"
+      }
+      """.formatted(LoggingEvent.class.getSimpleName(), Instant.now().minusSeconds(10));
     DomainEvent deserializedEvent = objectMapper.readValue(json, DomainEvent.class);
 
     assertNotNull(deserializedEvent);
@@ -116,16 +112,15 @@ class DomainEventJacksonModuleTest {
   void deserialization_shouldFailForUnknownSubtype() {
     String unknownEventClassName = "UnknownExistEvent";
     String json =
-      "{\n" +
-      "  \"@type\": \"" +
-      unknownEventClassName +
-      "\",\n" +
-      "  \"eventId\": \"unknown-id\",\n" +
-      "  \"occurredOn\": \"" +
-      LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) +
-      "\",\n" +
-      "  \"data\": \"some data\"\n" +
-      "}";
+      """
+      {
+        "@type": "%s",
+        "eventId": "unknown-id",
+        "occurredOn": "%s",
+        "data": "some data"
+      }
+      """.formatted(unknownEventClassName, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
     assertThrows(JsonMappingException.class, () -> objectMapper.readValue(json, DomainEvent.class));
   }
 }

@@ -1,6 +1,6 @@
 package fr.rewrite.server.shared.error.infrastructure.primary;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import ch.qos.logback.classic.Level;
 import fr.rewrite.server.Logs;
