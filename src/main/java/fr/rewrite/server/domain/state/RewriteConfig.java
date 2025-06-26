@@ -4,10 +4,11 @@ import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.shared.error.domain.Assert;
 import java.nio.file.Path;
 
-public record RewriteConfig(Path configDirectory, Path workDirectory) {
+public record RewriteConfig(Path configDirectory, Path workDirectory, Path mvnPath) {
   public RewriteConfig {
     Assert.notNull("configDirectory", configDirectory);
     Assert.notNull("workDirectory", workDirectory);
+    Assert.notNull("mvnPath", mvnPath);
   }
 
   public Path resolve(RewriteId rewriteId) {
@@ -33,6 +34,7 @@ public record RewriteConfig(Path configDirectory, Path workDirectory) {
 
     private Path configDirectory;
     private Path workDirectory;
+    private Path mvnPath;
 
     private RewriteConfigBuilder() {}
 
@@ -41,7 +43,7 @@ public record RewriteConfig(Path configDirectory, Path workDirectory) {
     }
 
     public RewriteConfig build() {
-      return new RewriteConfig(configDirectory, workDirectory);
+      return new RewriteConfig(configDirectory, workDirectory, mvnPath);
     }
 
     public RewriteConfigBuilder configDirectory(String configDirectory) {
@@ -53,6 +55,12 @@ public record RewriteConfig(Path configDirectory, Path workDirectory) {
     public RewriteConfigBuilder workDirectory(String workDirectory) {
       Assert.field("workDirectory", workDirectory).notBlank();
       this.workDirectory = Path.of(workDirectory);
+      return this;
+    }
+
+    public RewriteConfigBuilder mvnPath(String mvnPath) {
+      Assert.field("mvnPath", mvnPath).notBlank();
+      this.mvnPath = Path.of(mvnPath);
       return this;
     }
   }

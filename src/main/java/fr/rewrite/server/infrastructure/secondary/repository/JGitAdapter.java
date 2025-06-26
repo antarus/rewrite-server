@@ -1,12 +1,11 @@
 package fr.rewrite.server.infrastructure.secondary.repository;
 
 import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.repository.CloneRepositoryException;
-import fr.rewrite.server.domain.repository.Credentials;
-import fr.rewrite.server.domain.repository.RepositoryPort;
-import fr.rewrite.server.domain.repository.RepositoryURL;
+import fr.rewrite.server.domain.repository.*;
 import fr.rewrite.server.domain.state.RewriteConfig;
 import fr.rewrite.server.shared.error.domain.Assert;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -58,6 +57,19 @@ public class JGitAdapter implements RepositoryPort {
       }
     } catch (GitAPIException e) {
       throw new CloneRepositoryException(repositoryURL, e);
+    }
+  }
+
+  @Override
+  public void createBranch(RewriteId rewriteId, String branchName) {
+    Assert.notNull("rewriteId", rewriteId);
+    Assert.notNull("branchName", branchName);
+    Path path = rewriteConfig.resolve(rewriteId);
+    try (Git git = Git.open(path.toFile())) {
+      git.branchCreate().setName(branchName).call();
+      log.info("Branch {} created in repository {}", branchName, rewriteId.get());
+    } catch (IOException | GitAPIException e) {
+      throw new CreateBranchException(rewriteId, branchName, e);
     }
   }
 

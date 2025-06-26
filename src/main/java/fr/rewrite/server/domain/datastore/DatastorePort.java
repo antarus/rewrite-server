@@ -12,4 +12,6 @@ public interface DatastorePort {
   Datastore getDatastore(RewriteId id);
 
   Set<Path> listAllFiles(RewriteId id) throws FileSystemOperationException;
+
+  boolean exists(RewriteId id);
 }

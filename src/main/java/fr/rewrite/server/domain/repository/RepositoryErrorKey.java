@@ -4,7 +4,9 @@ import fr.rewrite.server.shared.error.domain.ErrorKey;
 
 public enum RepositoryErrorKey implements ErrorKey {
   REPOSITORY_INVALID_URI("repository-invalid-uri"),
-  REPOSITORY_CLONE_ERROR("repository-clone-error");
+  REPOSITORY_CLONE_ERROR("repository-clone-error"),
+  BRANCH_CREATION_ERROR("branch-creation-error"),
+  INVALID_STATE_TRANSITION("invalid-state-transition");
 
   private final String key;
 

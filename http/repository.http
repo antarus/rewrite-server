@@ -8,5 +8,12 @@ Content-Type: application/json
   "pat": "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"
 }
 }
+
 ###
-f
+
+POST https://{{host}}/api/rewrite/repository/904d1170-4bd7-3324-8139-95115b43bbe4/branch
+Content-Type: application/json
+
+{
+  "name": "feat/test"
+}

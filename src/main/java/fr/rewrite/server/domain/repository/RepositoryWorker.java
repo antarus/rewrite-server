@@ -2,7 +2,7 @@ package fr.rewrite.server.domain.repository;
 
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.ddd.DomainService;
-import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.events.EventBusPort;
 
 @DomainService
 public class RepositoryWorker {
@@ -23,5 +23,10 @@ public class RepositoryWorker {
   public void cloneARepository(RepositoryURL repositoryURL, Credentials credential) {
     repositoryPort.cloneRepository(repositoryURL, credential);
     eventBus.publish(RepositoryClonedEvent.from(RewriteId.from(repositoryURL)));
+  }
+
+  public void createBranch(RewriteId rewriteId, String currentBranch) {
+    repositoryPort.createBranch(rewriteId, currentBranch);
+    eventBus.publish(BranchCreatedEvent.from(rewriteId));
   }
 }

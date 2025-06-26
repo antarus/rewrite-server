@@ -1,7 +1,13 @@
 package fr.rewrite.server.domain.events;
 
+import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.build.BuildFinishedEvent;
+import fr.rewrite.server.domain.datastore.DatastoreCreatedEvent;
 import fr.rewrite.server.domain.ddd.DomainService;
+import fr.rewrite.server.domain.repository.BranchCreatedEvent;
 import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
+import fr.rewrite.server.domain.state.StateEnum;
+import fr.rewrite.server.domain.state.StateRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11,17 +17,20 @@ import org.slf4j.LoggerFactory;
 @DomainService
 public class DomainEventHandlerService {
 
-  private final Map<Class<? extends DomainEvent>, Consumer<DomainEvent>> handlers = new HashMap<>();
-
+  private final Map<Class<?>, Consumer<DomainEvent>> handlers = new HashMap<>();
   private static final Logger log = LoggerFactory.getLogger(DomainEventHandlerService.class);
+  private final StateRepository stateRepository;
 
-  public DomainEventHandlerService() {
+  public DomainEventHandlerService(StateRepository stateRepository) {
+    this.stateRepository = stateRepository;
     initHandlers();
   }
 
   private void initHandlers() {
-    registerHandler(RepositoryClonedEvent.class, this::handleRepositoryCreatedEvent);
-    registerHandler(LoggingEvent.class, this::handleLoggingEvent);
+    registerHandler(DatastoreCreatedEvent.class, this::handleDatastoreCreatedEvent);
+    registerHandler(RepositoryClonedEvent.class, this::handleRepositoryClonedEvent);
+    registerHandler(BranchCreatedEvent.class, this::handleBranchCreatedEvent);
+    registerHandler(BuildFinishedEvent.class, this::handleBuildFinishedEvent);
   }
 
   <T extends DomainEvent> void registerHandler(Class<T> eventType, Consumer<T> handler) {
@@ -46,11 +55,23 @@ public class DomainEventHandlerService {
     }
   }
 
-  void handleRepositoryCreatedEvent(RepositoryClonedEvent event) {
-    log.info("DomainEventHandlerService: Handling RepositoryCreatedEvent : {}", event.rewriteId());
+  private void handleDatastoreCreatedEvent(DatastoreCreatedEvent event) {
+    updateState(event.rewriteId(), StateEnum.DATASTORE_CREATED);
   }
 
-  void handleLoggingEvent(LoggingEvent event) {
-    log.info("DomainEventHandlerService: Handling LoggingEvent : {}", event.log());
+  private void handleRepositoryClonedEvent(RepositoryClonedEvent event) {
+    updateState(event.rewriteId(), StateEnum.CLONED);
+  }
+
+  private void handleBranchCreatedEvent(BranchCreatedEvent event) {
+    updateState(event.rewriteId(), StateEnum.BRANCH_CREATED);
+  }
+
+  private void handleBuildFinishedEvent(BuildFinishedEvent event) {
+    updateState(event.rewriteId(), StateEnum.BUILD);
+  }
+
+  private void updateState(RewriteId rewriteId, StateEnum newStatus) {
+    stateRepository.get(rewriteId).map(state -> state.withStatus(newStatus)).ifPresent(stateRepository::save);
   }
 }

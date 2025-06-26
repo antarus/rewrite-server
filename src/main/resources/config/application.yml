@@ -84,6 +84,7 @@ rewrite:
   server:
     config: /home/cedric/rewrite/config
     work: /home/cedric/rewrite/repository
+    mvn-path: /home/cedric/.sdkman/candidates/maven/current/bin/mvn
 management:
   endpoint:
     health:

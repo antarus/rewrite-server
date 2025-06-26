@@ -1,7 +1,7 @@
 package fr.rewrite.server.infrastructure.secondary.event;
 
 import fr.rewrite.server.domain.events.DomainEvent;
-import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.events.EventBusPort;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

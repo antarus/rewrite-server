@@ -7,7 +7,7 @@ import static org.mockito.Mockito.*;
 
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.events.EventBusPort;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.UUID;
@@ -87,7 +87,7 @@ class DatastoreWorkerTest {
   @DisplayName("getDatastore should call datastorePort.getDatastore and return the result")
   void getDatastore_shouldCallGetDatastoreAndReturnResult() {
     RewriteId testRewriteId = new RewriteId(UUID.randomUUID());
-    Datastore expectedDatastore = new Datastore(testRewriteId, Path.of("/repo/path"), Collections.emptySet());
+    Datastore expectedDatastore = new Datastore(testRewriteId);
 
     when(mockDatastorePort.getDatastore(testRewriteId)).thenReturn(expectedDatastore);
 

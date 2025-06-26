@@ -8,12 +8,12 @@ import fr.rewrite.server.shared.error.domain.Assert;
 import java.time.Instant;
 import java.util.UUID;
 
-public record RepositoryClonedEvent(UUID eventId, Instant occurredOn, UUID rewriteId) implements DomainEvent {
+public record RepositoryClonedEvent(UUID eventId, Instant occurredOn, RewriteId rewriteId) implements DomainEvent {
   protected static final class RepositoryClonedEventBuilder {
 
     private UUID eventId;
     private Instant occurredOn;
-    private UUID rewriteId;
+    private RewriteId rewriteId;
 
     private RepositoryClonedEventBuilder() {}
 
@@ -33,15 +33,12 @@ public record RepositoryClonedEvent(UUID eventId, Instant occurredOn, UUID rewri
     }
 
     RepositoryClonedEventBuilder rewriteId(UUID rewriteId) {
-      this.rewriteId = rewriteId;
+      this.rewriteId = RewriteId.from(rewriteId);
       return this;
     }
 
     RepositoryClonedEventBuilder rewriteId(RewriteId rewriteId) {
-      if (rewriteId == null) {
-        return this;
-      }
-      this.rewriteId = rewriteId.uuid();
+      this.rewriteId = rewriteId;
       return this;
     }
   }

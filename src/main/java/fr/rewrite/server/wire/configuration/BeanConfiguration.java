@@ -2,11 +2,12 @@ package fr.rewrite.server.wire.configuration;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.rewrite.server.domain.build.BuildPort;
 import fr.rewrite.server.domain.datastore.DatastorePort;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
+import fr.rewrite.server.domain.events.EventBusPort;
 import fr.rewrite.server.domain.repository.RepositoryPort;
 import fr.rewrite.server.domain.spi.BuildToolPort;
-import fr.rewrite.server.domain.spi.EventBusPort;
 import fr.rewrite.server.domain.spi.PullRequestServicePort;
 import fr.rewrite.server.domain.spi.RewriteEnginePort;
 import fr.rewrite.server.domain.state.RewriteConfig;
@@ -15,6 +16,9 @@ import fr.rewrite.server.infrastructure.poc.GitHubApiAdapter;
 import fr.rewrite.server.infrastructure.poc.GitLabApiAdapter;
 import fr.rewrite.server.infrastructure.poc.MavenBuildToolAdapter;
 import fr.rewrite.server.infrastructure.poc.OpenRewriteAdapter;
+import fr.rewrite.server.infrastructure.secondary.build.BuildAdapter;
+import fr.rewrite.server.infrastructure.secondary.build.MavenBuildTool;
+import fr.rewrite.server.infrastructure.secondary.build.Tool;
 import fr.rewrite.server.infrastructure.secondary.event.EventServiceAdapter;
 import fr.rewrite.server.infrastructure.secondary.event.InMemoryEventBusAdapter;
 import fr.rewrite.server.infrastructure.secondary.filesystem.JsonFileSystemRepository;
@@ -63,26 +67,41 @@ class BeanConfiguration {
     return new JGitAdapter(rewriteConfig);
   }
 
+  @Bean("mavenTool")
+  public Tool mavenTool(RewriteConfig rewriteConfig) {
+    return new MavenBuildTool(rewriteConfig);
+  }
+
+  @Bean
+  public BuildPort gitBuildPort(RewriteConfig rewriteConfig, @Qualifier("mavenTool") Tool mavenTool) {
+    return new BuildAdapter(rewriteConfig, mavenTool);
+  }
+
+  @Deprecated(forRemoval = true)
   @Bean
   public BuildToolPort buildToolPort() {
     return new MavenBuildToolAdapter();
   }
 
+  @Deprecated(forRemoval = true)
   @Bean
   public RewriteEnginePort rewriteEnginePort() {
     return new OpenRewriteAdapter();
   }
 
+  @Deprecated(forRemoval = true)
   @Bean
   public HttpClient httpClient() {
     return HttpClient.newHttpClient();
   }
 
+  @Deprecated(forRemoval = true)
   @Bean("gitHubApiAdapter")
   public GitHubApiAdapter gitHubApiAdapter(HttpClient httpClient) {
     return new GitHubApiAdapter(httpClient);
   }
 
+  @Deprecated(forRemoval = true)
   @Bean("gitLabApiAdapter")
   public GitLabApiAdapter gitLabApiAdapter(HttpClient httpClient) {
     return new GitLabApiAdapter(httpClient);
@@ -90,7 +109,7 @@ class BeanConfiguration {
 
   // Le PlatformServiceSelector est une classe @Service, Spring crée automatiquement un bean pour elle.
   // Son nom de bean par défaut sera "platformServiceSelector" (nom de classe en camelCase).
-
+  @Deprecated(forRemoval = true)
   @Bean
   public RewriteOrchestrator rewriteOrchestrator(
     RepositoryPort gitRepositoryPort,

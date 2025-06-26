@@ -1,6 +1,8 @@
 package fr.rewrite.server.infrastructure.secondary.job;
 
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.build.BuildWorker;
+import fr.rewrite.server.domain.datastore.Datastore;
 import fr.rewrite.server.domain.datastore.DatastoreWorker;
 import fr.rewrite.server.domain.repository.Credentials;
 import fr.rewrite.server.domain.repository.RepositoryURL;
@@ -31,10 +33,12 @@ public class JobQueueAdapter implements JobPort {
   private volatile boolean running = true;
   private final DatastoreWorker datastoreWorker;
   private final RepositoryWorker repositoryWorker;
+  private final BuildWorker buildWorker;
 
-  public JobQueueAdapter(DatastoreWorker datastoreWorker, RepositoryWorker repositoryWorker) {
+  public JobQueueAdapter(DatastoreWorker datastoreWorker, RepositoryWorker repositoryWorker, BuildWorker buildWorker) {
     this.datastoreWorker = datastoreWorker;
     this.repositoryWorker = repositoryWorker;
+    this.buildWorker = buildWorker;
   }
 
   @PostConstruct
@@ -106,5 +110,15 @@ public class JobQueueAdapter implements JobPort {
   @Override
   public void cloneRepository(RepositoryURL repositoryURL, Credentials credential) {
     enqueueJob(() -> repositoryWorker.cloneARepository(repositoryURL, credential));
+  }
+
+  @Override
+  public void createBranch(RewriteId rewriteId, String currentBranch) {
+    enqueueJob(() -> repositoryWorker.createBranch(rewriteId, currentBranch));
+  }
+
+  @Override
+  public void buildProject(Datastore datastore) {
+    enqueueJob(() -> buildWorker.buildProject(datastore));
   }
 }

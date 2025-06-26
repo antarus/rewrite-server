@@ -13,6 +13,7 @@ import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.datastore.Datastore;
 import fr.rewrite.server.domain.datastore.DatastoreNotFoundException;
+import fr.rewrite.server.domain.datastore.DatastoreNotValidException;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.domain.state.RewriteConfig;
@@ -43,6 +44,8 @@ class NioFileSystemAdapterTest {
   @TempDir
   Path tempWorkDirectory;
 
+  Path mvnPath = Path.of("/tmp/mvn");
+
   private RewriteConfig rewriteConfig;
 
   @BeforeEach
@@ -53,7 +56,11 @@ class NioFileSystemAdapterTest {
     listAppender.start();
     logger.addAppender(listAppender);
     logger.setLevel(Level.DEBUG);
-    rewriteConfig = new RewriteConfig(tempConfigDirectory, tempWorkDirectory);
+    rewriteConfig = RewriteConfig.RewriteConfigBuilder.aRewriteConfig()
+      .configDirectory(tempConfigDirectory.toString())
+      .workDirectory(tempWorkDirectory.toString())
+      .mvnPath(mvnPath.toString())
+      .build();
     nioFileSystemAdapter = new NioFileSystemAdapter(rewriteConfig);
   }
 
@@ -64,7 +71,7 @@ class NioFileSystemAdapterTest {
   }
 
   @Test
-  void createDatastore_shouldCreateDirectory_whenSuccessful() throws FileSystemOperationException, IOException {
+  void createDatastore_shouldCreateDirectory_whenSuccessful() throws FileSystemOperationException {
     RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/succes"));
 
     nioFileSystemAdapter.createDatastore(rewriteId);
@@ -93,13 +100,13 @@ class NioFileSystemAdapterTest {
 
       assertThatThrownBy(() -> nioFileSystemAdapter.createDatastore(rewriteId))
         .isInstanceOf(FileSystemOperationException.class)
-        .hasMessageContaining("Failed to create datastore: " + failingPath)
+        .hasMessageContaining("Failed to create datastore: " + rewriteConfig.maskWorkdirectory(failingPath))
         .hasCauseInstanceOf(IOException.class);
 
       List<ILoggingEvent> logs = listAppender.list;
       assertThat(logs).hasSize(1);
-      assertThat(logs.get(0).getLevel()).isEqualTo(Level.DEBUG);
-      assertThat(logs.get(0).getFormattedMessage()).contains("Creating datastore");
+      assertThat(logs.getFirst().getLevel()).isEqualTo(Level.DEBUG);
+      assertThat(logs.getFirst().getFormattedMessage()).contains("Creating datastore");
     }
   }
 
@@ -132,8 +139,10 @@ class NioFileSystemAdapterTest {
 
     List<ILoggingEvent> logs = listAppender.list;
     assertThat(logs).hasSize(1);
-    assertThat(logs.get(0).getLevel()).isEqualTo(Level.WARN);
-    assertThat(logs.get(0).getFormattedMessage()).contains("Datastore does not exist, skipping deletion: " + nonExistentDatastore);
+    assertThat(logs.getFirst().getLevel()).isEqualTo(Level.WARN);
+    assertThat(logs.getFirst().getFormattedMessage()).contains(
+      "Datastore does not exist, skipping deletion: " + rewriteConfig.maskWorkdirectory(nonExistentDatastore)
+    );
   }
 
   @Test
@@ -158,7 +167,7 @@ class NioFileSystemAdapterTest {
 
       assertThatThrownBy(() -> nioFileSystemAdapter.deleteDatastore(rewriteId))
         .isInstanceOf(FileSystemOperationException.class)
-        .hasMessageContaining("Failed to delete Datastore: " + failingDeleteDir)
+        .hasMessageContaining("Failed to delete Datastore: " + rewriteConfig.maskWorkdirectory(failingDeleteDir))
         .hasCauseInstanceOf(IOException.class);
 
       List<ILoggingEvent> logs = listAppender.list;
@@ -194,7 +203,7 @@ class NioFileSystemAdapterTest {
 
     assertThatThrownBy(() -> nioFileSystemAdapter.listAllFiles(rewriteId))
       .isInstanceOf(FileSystemOperationException.class)
-      .hasMessageContaining("Path must be a directory: " + filePath);
+      .hasMessageContaining("Path must be a directory: " + rewriteConfig.maskWorkdirectory(filePath));
 
     assertThat(listAppender.list).isEmpty();
   }
@@ -215,7 +224,7 @@ class NioFileSystemAdapterTest {
 
       assertThatThrownBy(() -> nioFileSystemAdapter.listAllFiles(rewriteId))
         .isInstanceOf(FileSystemOperationException.class)
-        .hasMessageContaining("Failed to list files in datastore: " + failingListDir)
+        .hasMessageContaining("Failed to list files in datastore: " + rewriteConfig.maskWorkdirectory(failingListDir))
         .hasCauseInstanceOf(IOException.class);
 
       assertThat(listAppender.list).isEmpty();
@@ -227,20 +236,15 @@ class NioFileSystemAdapterTest {
     RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/get_datastore_success"));
     Path datastorePath = tempWorkDirectory.resolve(rewriteId.get().toString());
     Files.createDirectories(datastorePath);
-    Path file1 = Files.createFile(datastorePath.resolve("config.json"));
-    Path file2 = Files.createFile(datastorePath.resolve("data.txt"));
     Datastore datastore = nioFileSystemAdapter.getDatastore(rewriteId);
     assertThat(datastore).isNotNull();
     assertThat(datastore.rewriteId()).isEqualTo(rewriteId);
-    assertThat(datastore.path()).isEqualTo(datastorePath);
-    assertThat(datastore.files()).containsExactlyInAnyOrder(file1, file2);
 
     assertThat(listAppender.list).isEmpty();
   }
 
   @Test
   void getDatastore_shouldThrowDatastoreNotFoundException_whenPathDoesNotExist() {
-    // Arrange
     RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/not_found_datastorekkkk"));
 
     assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId)).isInstanceOf(DatastoreNotFoundException.class);
@@ -251,13 +255,10 @@ class NioFileSystemAdapterTest {
   @Test
   void getDatastore_shouldThrowDatastoreNotFoundException_whenPathExistsButIsNotDirectory() throws IOException {
     RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/not_a_directory"));
-    Path fileInsteadOfDir = tempWorkDirectory.resolve(rewriteId.get().toString());
-    Files.createFile(fileInsteadOfDir); // Create a file instead of a directory
+    Path fileInsteadOfDir = rewriteConfig.resolve(rewriteId);
+    Files.createFile(fileInsteadOfDir);
 
-    assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId))
-      .isInstanceOf(FileSystemOperationException.class)
-      .hasMessageContaining("Path must be a directory: " + fileInsteadOfDir);
-
+    assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId)).isInstanceOf(DatastoreNotValidException.class);
     assertThat(listAppender.list).isEmpty();
   }
 
@@ -268,23 +269,5 @@ class NioFileSystemAdapterTest {
     assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(nullRewriteId))
       .isInstanceOf(MissingMandatoryValueException.class)
       .hasMessageContaining(NioFileSystemAdapter.REWRITE_ID);
-  }
-
-  @Test
-  void getDatastore_shouldPropagateFileSystemOperationException_fromListAllFiles() throws IOException {
-    RewriteId rewriteId = RewriteId.from(RepositoryURL.from("https://test.com/owner/list_error_during_get"));
-    Path datastorePath = tempWorkDirectory.resolve(rewriteId.get().toString());
-    Files.createDirectories(datastorePath);
-    try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
-      mockedFiles.when(() -> Files.exists(datastorePath)).thenReturn(true);
-      mockedFiles.when(() -> Files.isDirectory(datastorePath)).thenReturn(true); // listAllFiles checks this
-      mockedFiles.when(() -> Files.walk(datastorePath)).thenThrow(new IOException("Simulated file read error"));
-
-      assertThatThrownBy(() -> nioFileSystemAdapter.getDatastore(rewriteId))
-        .isInstanceOf(FileSystemOperationException.class)
-        .hasMessageContaining("Failed to list files in datastore: " + datastorePath)
-        .hasCauseInstanceOf(IOException.class);
-    }
-    assertThat(listAppender.list).isEmpty();
   }
 }

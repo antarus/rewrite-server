@@ -13,7 +13,6 @@ import java.util.Optional;
 public class DatastoreManagerImpl implements DatastoreManager {
 
   private final JobPort jobPort;
-
   private final StateRepository stateRepository;
   private final DatastoreWorker datastoreWorker;
 

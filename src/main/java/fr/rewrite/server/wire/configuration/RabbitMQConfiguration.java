@@ -2,7 +2,8 @@ package fr.rewrite.server.wire.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.rewrite.server.domain.events.DomainEventHandlerService;
-import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.events.EventBusPort;
+import fr.rewrite.server.domain.state.StateRepository;
 import fr.rewrite.server.infrastructure.secondary.event.GenericDomainEventsRabbitMQListener;
 import fr.rewrite.server.infrastructure.secondary.event.RabbitMQEventBusAdapter;
 import org.springframework.amqp.core.TopicExchange;
@@ -33,8 +34,8 @@ class RabbitMQConfiguration {
   }
 
   @Bean
-  public DomainEventHandlerService domainEventHandlerService() {
-    return new DomainEventHandlerService();
+  public DomainEventHandlerService domainEventHandlerService(StateRepository stateRepository) {
+    return new DomainEventHandlerService(stateRepository);
   }
 
   @Bean

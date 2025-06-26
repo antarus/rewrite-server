@@ -3,189 +3,140 @@ package fr.rewrite.server.domain.events;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.datastore.DatastoreCreatedEvent;
+import fr.rewrite.server.domain.repository.BranchCreatedEvent;
 import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import fr.rewrite.server.domain.state.State;
+import fr.rewrite.server.domain.state.StateEnum;
+import fr.rewrite.server.domain.state.StateRepository;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.LoggerFactory;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 @UnitTest
 class DomainEventHandlerServiceTest {
 
-  private DomainEventHandlerService domainEventHandlerService;
-  private ListAppender<ILoggingEvent> listAppender;
-  private Logger logger;
-
   @Mock
-  private Consumer<RepositoryClonedEvent> mockRepositoryCreatedHandler;
+  private StateRepository stateRepository;
+
+  @Captor
+  private ArgumentCaptor<State> stateCaptor;
+
+  private DomainEventHandlerService domainEventHandlerService;
+  private static final String DOMAIN_EVENTS_PACKAGE = "fr.rewrite.server.domain";
 
   @BeforeEach
   void setUp() {
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-    logger = loggerContext.getLogger(DomainEventHandlerService.class.getName());
-    listAppender = new ListAppender<>();
-    listAppender.start();
-    logger.addAppender(listAppender);
-    logger.setLevel(Level.DEBUG);
-
     MockitoAnnotations.openMocks(this);
-
-    domainEventHandlerService = Mockito.spy(new DomainEventHandlerService());
-
-    doNothing().when(domainEventHandlerService).handleLoggingEvent(any(LoggingEvent.class));
-  }
-
-  @AfterEach
-  void tearDown() {
-    logger.detachAppender(listAppender);
-    listAppender.stop();
+    domainEventHandlerService = new DomainEventHandlerService(stateRepository);
   }
 
   @Test
-  void handleEvent_shouldLogInfo_whenNoHandlerRegistered() {
-    DomainEvent unknownEvent = new UnknownEvent(UUID.randomUUID(), Instant.now(), "dsd");
+  void shouldUpdateStateToClonedOnRepositoryClonedEvent() {
+    // Given
+    RewriteId rewriteId = RewriteId.from(UUID.randomUUID());
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(rewriteId);
+    State initialState = State.init(rewriteId);
+    when(stateRepository.get(rewriteId)).thenReturn(Optional.of(initialState));
 
-    domainEventHandlerService.handleEvent(unknownEvent);
-
-    List<ILoggingEvent> logs = listAppender.list;
-
-    assertThat(logs).hasSize(1);
-    assertThat(logs.get(0).getLevel()).isEqualTo(Level.INFO);
-    assertThat(logs.get(0).getFormattedMessage()).contains(
-      "DomainEventHandlerService: No specific handler registered for event type: UnknownEvent"
-    );
-    assertThat(logs.get(0).getArgumentArray()).containsExactly(unknownEvent.getClass().getSimpleName());
-  }
-
-  @Test
-  void handleRepositoryCreatedEvent_shouldLogInfoWithEventPath() {
-    RepositoryClonedEvent event = new RepositoryClonedEvent(
-      UUID.randomUUID(),
-      Instant.now(),
-      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
-    );
-
-    doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
+    // When
     domainEventHandlerService.handleEvent(event);
 
-    List<ILoggingEvent> logs = listAppender.list;
-
-    assertThat(logs).hasSize(2);
-    assertThat(logs.get(0).getLevel()).isEqualTo(Level.DEBUG);
-    assertThat(logs.get(1).getLevel()).isEqualTo(Level.INFO);
-    assertThat(logs.get(1).getFormattedMessage()).contains(
-      "DomainEventHandlerService: Handling RepositoryCreatedEvent : " + event.rewriteId()
-    );
-    assertThat(logs.get(1).getArgumentArray()).containsExactly(UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a"));
+    // Then
+    verify(stateRepository).save(stateCaptor.capture());
+    State savedState = stateCaptor.getValue();
+    assertThat(savedState.status()).isEqualTo(StateEnum.CLONED);
+    assertThat(savedState.rewriteId()).isEqualTo(rewriteId);
   }
 
   @Test
-  void handleEvent_shouldCallRepositoryCreatedEventHandler_whenRepositoryCreatedEvent() {
-    RepositoryClonedEvent event = new RepositoryClonedEvent(
-      UUID.randomUUID(),
-      Instant.now(),
-      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
-    );
-    doCallRealMethod().when(domainEventHandlerService).handleRepositoryCreatedEvent(event);
+  void shouldUpdateStateToBranchCreatedOnBranchCreatedEvent() {
+    // Given
+    RewriteId rewriteId = RewriteId.from(UUID.randomUUID());
+    BranchCreatedEvent event = BranchCreatedEvent.from(rewriteId);
+    State initialState = State.init(rewriteId).withStatus(StateEnum.BRANCH_CREATING);
+    when(stateRepository.get(rewriteId)).thenReturn(Optional.of(initialState));
 
-    Mockito.doAnswer(i -> {
-      Consumer<DomainEvent> consumer = event1 -> domainEventHandlerService.handleRepositoryCreatedEvent(event);
-      consumer.accept(event);
-      return null;
-    })
-      .when(domainEventHandlerService)
-      .handleEvent(event);
+    // When
     domainEventHandlerService.handleEvent(event);
 
-    verify(domainEventHandlerService, times(1)).handleRepositoryCreatedEvent(event);
-    verify(domainEventHandlerService, never()).handleLoggingEvent(any(LoggingEvent.class));
+    // Then
+    verify(stateRepository).save(stateCaptor.capture());
+    State savedState = stateCaptor.getValue();
+    assertThat(savedState.status()).isEqualTo(StateEnum.BRANCH_CREATED);
+    assertThat(savedState.rewriteId()).isEqualTo(rewriteId);
   }
 
   @Test
-  void handleEvent_shouldCallLoggingEventHandler_whenLoggingEvent() {
-    LoggingEvent event = new LoggingEvent(UUID.randomUUID(), Instant.now(), "Test log message");
-    doCallRealMethod().when(domainEventHandlerService).handleLoggingEvent(event);
-
-    Mockito.doAnswer(i -> {
-      Consumer<DomainEvent> consumer = event1 -> domainEventHandlerService.handleLoggingEvent(event);
-      consumer.accept(event);
-      return null;
-    })
-      .when(domainEventHandlerService)
-      .handleEvent(event);
-    domainEventHandlerService.handleEvent(event);
-
-    verify(domainEventHandlerService, times(1)).handleLoggingEvent(event);
-    verify(domainEventHandlerService, never()).handleRepositoryCreatedEvent(any(RepositoryClonedEvent.class));
-  }
-
-  @Test
-  void handleEvent_shouldLogError_whenHandlerThrowsException() {
-    RepositoryClonedEvent event = new RepositoryClonedEvent(
-      UUID.randomUUID(),
-      Instant.now(),
-      UUID.fromString("9602cb42-fd9f-445e-a2be-6385ced7ea6a")
+  void allDomainEventsShouldHaveAHandler() throws NoSuchFieldException, IllegalAccessException {
+    Reflections reflections = new Reflections(
+      new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage(DOMAIN_EVENTS_PACKAGE)).setScanners(Scanners.SubTypes)
     );
+    Set<Class<? extends DomainEvent>> actualDomainEventClasses = reflections.getSubTypesOf(DomainEvent.class);
 
-    doThrow(new RuntimeException("Simulated handler error")).when(mockRepositoryCreatedHandler).accept(event);
-    domainEventHandlerService.registerHandler(RepositoryClonedEvent.class, mockRepositoryCreatedHandler);
-    domainEventHandlerService.handleEvent(event);
-    verify(mockRepositoryCreatedHandler, times(1)).accept(event);
+    actualDomainEventClasses.remove(DomainEvent.class);
 
-    List<ILoggingEvent> logs = listAppender.list;
-    assertThat(logs).hasSize(2);
-    assertThat(logs.get(0).getLevel()).isEqualTo(Level.DEBUG);
-    assertThat(logs.get(1).getLevel()).isEqualTo(Level.ERROR);
-    assertThat(logs.get(1).getFormattedMessage()).containsPattern(
-      "Error processing event .+ of type RepositoryClonedEvent : Simulated handler error"
-    );
-    assertThat(logs.get(1).getArgumentArray()).contains(event.eventId(), event.getClass().getSimpleName(), "Simulated handler error");
+    Set<Class<? extends DomainEvent>> ignoredTestEvents = new HashSet<>();
+    ignoredTestEvents.add(TestEvent.class);
+    ignoredTestEvents.add(AnotherTestEvent.class);
+    ignoredTestEvents.add(UnknownEvent.class);
+    ignoredTestEvents.add(LoggingEvent.class);
+
+    actualDomainEventClasses.removeAll(ignoredTestEvents);
+
+    Field handlersField = DomainEventHandlerService.class.getDeclaredField("handlers");
+    handlersField.setAccessible(true);
+
+    @SuppressWarnings("unchecked")
+    Map<Class<?>, Consumer<DomainEvent>> handlers = (Map<Class<?>, Consumer<DomainEvent>>) handlersField.get(domainEventHandlerService);
+
+    Set<Class<?>> registeredHandlers = handlers.keySet();
+
+    assertThat(registeredHandlers)
+      .as("All concrete DomainEvent classes should have a registered handler")
+      .containsExactlyInAnyOrderElementsOf(actualDomainEventClasses);
   }
 
   @Test
-  void initHandlers_shouldRegisterKnownHandlers() {
-    domainEventHandlerService = new DomainEventHandlerService();
-
-    try {
-      java.lang.reflect.Field handlersField = DomainEventHandlerService.class.getDeclaredField("handlers");
-      handlersField.setAccessible(true);
-      @SuppressWarnings("unchecked")
-      Map<Class<? extends DomainEvent>, ?> handlers = (Map<Class<? extends DomainEvent>, ?>) handlersField.get(domainEventHandlerService);
-
-      assertThat(handlers).containsKey(RepositoryClonedEvent.class);
-      assertThat(handlers).containsKey(LoggingEvent.class);
-      assertThat(handlers).hasSize(2);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      throw new RuntimeException("Failed to access handlers map for verification", e);
-    }
-  }
-
-  @Test
-  void handleLoggingEvent_shouldLogInfoWithLogMessage() {
-    LoggingEvent event = new LoggingEvent(UUID.randomUUID(), Instant.now(), "User logged in successfully");
-
-    doCallRealMethod().when(domainEventHandlerService).handleLoggingEvent(event);
+  void handleEventShouldCallCorrectHandlerForDatastoreCreatedEvent() {
+    DatastoreCreatedEvent event = mock(DatastoreCreatedEvent.class);
+    when(event.rewriteId()).thenReturn(RewriteId.from(UUID.randomUUID()));
 
     domainEventHandlerService.handleEvent(event);
 
-    List<ILoggingEvent> logs = listAppender.list;
-    assertThat(logs).hasSize(2);
-    assertThat(logs.get(1).getLevel()).isEqualTo(Level.INFO);
-    assertThat(logs.get(1).getFormattedMessage()).contains("DomainEventHandlerService: Handling LoggingEvent : " + event.log());
-    assertThat(logs.get(1).getArgumentArray()).containsExactly(event.log());
+    // Verify that updateState was called (indirectly verifying handleDatastoreCreatedEvent was called)
+    verify(stateRepository, times(1)).get(any());
+  }
+
+  @Test
+  void handleEventShouldCallCorrectHandlerForRepositoryClonedEvent() {
+    RepositoryClonedEvent event = mock(RepositoryClonedEvent.class);
+    when(event.rewriteId()).thenReturn(RewriteId.from(UUID.randomUUID()));
+
+    domainEventHandlerService.handleEvent(event);
+
+    verify(stateRepository, times(1)).get(any());
+  }
+
+  @Test
+  void handleEventShouldCallCorrectHandlerForBranchCreatedEvent() {
+    BranchCreatedEvent event = mock(BranchCreatedEvent.class);
+    when(event.rewriteId()).thenReturn(mock(fr.rewrite.server.domain.RewriteId.class)); // Mock RewriteId
+
+    domainEventHandlerService.handleEvent(event);
+
+    verify(stateRepository, times(1)).get(any());
   }
 }

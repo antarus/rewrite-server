@@ -4,7 +4,8 @@ import fr.rewrite.server.shared.error.domain.ErrorKey;
 
 public enum DatastoreErrorKey implements ErrorKey {
   DATASTORE_ALREADY_EXIST("datastore-already-exist"),
-  DATASTORE_NOT_FOUND("datastore-not-found");
+  DATASTORE_NOT_FOUND("datastore-not-found"),
+  DATASTORE_NOT_VALID("datastore-not-valid");
 
   private final String key;
 

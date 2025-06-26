@@ -11,6 +11,11 @@ public record State(RewriteId rewriteId, StateEnum status, Instant createdAt, In
     Assert.field("updatedAt", updatedAt).inPast();
   }
   public static State init(RewriteId rewriteId) {
-    return new State(rewriteId, StateEnum.INIT, Instant.now(), Instant.now());
+    Instant now = Instant.now();
+    return new State(rewriteId, StateEnum.INIT, now, now);
+  }
+
+  public State withStatus(StateEnum newStatus) {
+    return new State(this.rewriteId, newStatus, this.createdAt, Instant.now());
   }
 }

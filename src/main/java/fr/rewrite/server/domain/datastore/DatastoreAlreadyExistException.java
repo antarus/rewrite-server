@@ -10,7 +10,6 @@ public class DatastoreAlreadyExistException extends RewriteServerException {
       badRequest(DatastoreErrorKey.DATASTORE_ALREADY_EXIST)
         .addParameter("id", datastore.rewriteId().get().toString())
         .addParameter("repository.url", repositoryURL.url())
-        .addParameter("datastore.path", datastore.path().toString())
     );
   }
 }

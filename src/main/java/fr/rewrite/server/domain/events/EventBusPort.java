@@ -1,6 +1,5 @@
-package fr.rewrite.server.domain.spi;
+package fr.rewrite.server.domain.events;
 
-import fr.rewrite.server.domain.events.DomainEvent;
 import java.util.function.Consumer;
 
 public interface EventBusPort {

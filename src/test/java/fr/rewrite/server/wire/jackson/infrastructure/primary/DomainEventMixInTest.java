@@ -5,10 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import fr.rewrite.server.UnitTest;
-import fr.rewrite.server.domain.events.AnotherTestEvent;
-import fr.rewrite.server.domain.events.DomainEvent;
-import fr.rewrite.server.domain.events.TestEvent;
-import fr.rewrite.server.domain.events.UnknownEvent;
+import fr.rewrite.server.domain.events.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +23,7 @@ import org.slf4j.LoggerFactory;
 class DomainEventMixInTest {
 
   private static final Logger log = LoggerFactory.getLogger(DomainEventMixInTest.class);
-  private static final String DOMAIN_EVENTS_PACKAGE = "fr.rewrite.server.domain.events";
+  private static final String DOMAIN_EVENTS_PACKAGE = "fr.rewrite.server.domain";
 
   @Test
   @DisplayName("All concrete DomainEvent implementations should be registered in DomainEventMixIn")
@@ -42,6 +39,7 @@ class DomainEventMixInTest {
     ignoredTestEvents.add(TestEvent.class);
     ignoredTestEvents.add(AnotherTestEvent.class);
     ignoredTestEvents.add(UnknownEvent.class);
+    ignoredTestEvents.add(LoggingEvent.class);
 
     actualDomainEventClasses.removeAll(ignoredTestEvents);
 

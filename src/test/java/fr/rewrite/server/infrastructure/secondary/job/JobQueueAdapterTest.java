@@ -11,6 +11,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.build.BuildWorker;
 import fr.rewrite.server.domain.datastore.DatastoreWorker;
 import fr.rewrite.server.domain.repository.RepositoryWorker;
 import java.util.Collections;
@@ -35,6 +36,7 @@ class JobQueueAdapterTest {
 
   private DatastoreWorker mockDatastoreWorker;
   private RepositoryWorker mockRepositoryWorker;
+  private BuildWorker mockBuildWorker;
 
   @BeforeEach
   void setUp() {
@@ -47,7 +49,8 @@ class JobQueueAdapterTest {
 
     mockDatastoreWorker = mock(DatastoreWorker.class);
     mockRepositoryWorker = mock(RepositoryWorker.class);
-    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
+    mockBuildWorker = mock(BuildWorker.class);
+    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker, mockBuildWorker);
 
     ReflectionTestUtils.setField(jobQueueAdapter, "poolSize", 1);
 
@@ -109,7 +112,7 @@ class JobQueueAdapterTest {
     }
     listAppender.list.clear();
 
-    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
+    jobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker, mockBuildWorker);
     ReflectionTestUtils.setField(jobQueueAdapter, "poolSize", 1);
 
     listAppender.list.clear();
@@ -204,7 +207,7 @@ class JobQueueAdapterTest {
 
   @Test
   void jobConsumer_shouldHandleInterruption() throws InterruptedException {
-    JobQueueAdapter testJobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker);
+    JobQueueAdapter testJobQueueAdapter = new JobQueueAdapter(mockDatastoreWorker, mockRepositoryWorker, mockBuildWorker);
     ReflectionTestUtils.setField(testJobQueueAdapter, "poolSize", 1);
 
     BlockingQueue<Runnable> mockJobQueue = mock(BlockingQueue.class);

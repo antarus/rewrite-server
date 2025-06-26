@@ -18,7 +18,6 @@ import fr.rewrite.server.domain.exception.DataAccessException;
 import fr.rewrite.server.domain.state.RewriteConfig;
 import fr.rewrite.server.domain.state.State;
 import fr.rewrite.server.domain.state.StateEnum;
-import fr.rewrite.server.shared.error.domain.MissingMandatoryValueException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +44,8 @@ class JsonFileSystemRepositoryTest {
   @TempDir
   Path tempWorkDirectory;
 
+  Path mvnPath = Path.of("/tmp/mvn");
+
   private JsonFileSystemRepository repository;
   private RewriteConfig rewriteConfig;
 
@@ -60,7 +61,11 @@ class JsonFileSystemRepositoryTest {
     logger.addAppender(listAppender);
     logger.setLevel(Level.DEBUG);
 
-    rewriteConfig = new RewriteConfig(tempConfigDirectory, tempWorkDirectory);
+    rewriteConfig = RewriteConfig.RewriteConfigBuilder.aRewriteConfig()
+      .configDirectory(tempConfigDirectory.toString())
+      .workDirectory(tempWorkDirectory.toString())
+      .mvnPath(mvnPath.toString())
+      .build();
     repository = new JsonFileSystemRepository(rewriteConfig);
   }
 
@@ -79,30 +84,16 @@ class JsonFileSystemRepositoryTest {
   }
 
   @Test
-  @DisplayName("Constructor should throw IllegalArgumentException if RewriteConfig.configDirectory is null")
-  void constructor_shouldThrowIllegalArgumentExceptionIfConfigDirectoryIsNull() {
-    MissingMandatoryValueException thrown = assertThrows(MissingMandatoryValueException.class, () -> {
-      new RewriteConfig(null, tempWorkDirectory);
-    });
-    assertThat(thrown.getMessage()).contains("configDirectory");
-  }
-
-  @Test
-  @DisplayName("Constructor should throw IllegalArgumentException if RewriteConfig.workDirectory is null")
-  void constructor_shouldThrowIllegalArgumentExceptionIfWorkDirectoryIsNull() {
-    MissingMandatoryValueException thrown = assertThrows(MissingMandatoryValueException.class, () -> {
-      new RewriteConfig(tempConfigDirectory, null);
-    });
-    assertThat(thrown.getMessage()).contains("workDirectory");
-  }
-
-  @Test
   @DisplayName("Constructor should throw RewriteException if configDirectory creation fails")
   void constructor_shouldThrowRewriteExceptionIfConfigDirectoryCreationFails() throws IOException {
     Path invalidConfigPath = tempConfigDirectory.resolve("file.txt").resolve("subdir");
     Files.createFile(tempConfigDirectory.resolve("file.txt"));
 
-    RewriteConfig invalidConfig = new RewriteConfig(invalidConfigPath, tempWorkDirectory);
+    RewriteConfig invalidConfig = RewriteConfig.RewriteConfigBuilder.aRewriteConfig()
+      .configDirectory(invalidConfigPath.toString())
+      .workDirectory(tempWorkDirectory.toString())
+      .mvnPath(mvnPath.toString())
+      .build();
 
     RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
       new JsonFileSystemRepository(invalidConfig);
@@ -117,7 +108,7 @@ class JsonFileSystemRepositoryTest {
     RewriteId id = new RewriteId(UUID.randomUUID());
     State state = new State(
       id,
-      StateEnum.REPO_CLONED,
+      StateEnum.BRANCH_CREATED,
       Instant.now().minus(2, ChronoUnit.MINUTES),
       Instant.now().minus(5, ChronoUnit.MINUTES)
     );
@@ -169,7 +160,7 @@ class JsonFileSystemRepositoryTest {
   @DisplayName("Get should return Optional with State record if file exists")
   void get_shouldReturnStateIfFileExists() throws IOException {
     RewriteId id = new RewriteId(UUID.randomUUID());
-    State expectedState = new State(id, StateEnum.REPO_CREATED, Instant.now().minus(1, ChronoUnit.DAYS), Instant.now());
+    State expectedState = new State(id, StateEnum.BRANCH_CREATING, Instant.now().minus(1, ChronoUnit.DAYS), Instant.now());
 
     Path filePath = tempConfigDirectory.resolve(id.get().toString() + ".json");
     ObjectMapper tempMapper = new ObjectMapper();

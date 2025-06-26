@@ -3,6 +3,7 @@ package fr.rewrite.server.infrastructure.secondary.filesystem;
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.datastore.Datastore;
 import fr.rewrite.server.domain.datastore.DatastoreNotFoundException;
+import fr.rewrite.server.domain.datastore.DatastoreNotValidException;
 import fr.rewrite.server.domain.datastore.DatastorePort;
 import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import fr.rewrite.server.domain.state.RewriteConfig;
@@ -42,13 +43,16 @@ public class NioFileSystemAdapter implements DatastorePort {
   public void createDatastore(RewriteId rewriteId) throws FileSystemOperationException {
     Assert.notNull(REWRITE_ID, rewriteId);
     Path datastorePath = getPathFromRewriteId(rewriteId);
-    log.debug("Creating datastore {}", datastorePath);
+    log.debug("Creating datastore {}", rewriteConfig.maskWorkdirectory(datastorePath));
 
     try {
       Files.createDirectories(datastorePath);
       log.info("Directory created: {}", datastorePath);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to create datastore: " + datastorePath + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException(
+        "Failed to create datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
+        e
+      );
       //TODO Exception
     }
   }
@@ -58,7 +62,7 @@ public class NioFileSystemAdapter implements DatastorePort {
     Assert.notNull(REWRITE_ID, rewriteId);
     Path datastorePath = getPathFromRewriteId(rewriteId);
     if (!Files.exists(datastorePath)) {
-      log.warn("Datastore does not exist, skipping deletion: {}", datastorePath);
+      log.warn("Datastore does not exist, skipping deletion: {}", rewriteConfig.maskWorkdirectory(datastorePath));
       return;
       //TODO Exception
     }
@@ -81,25 +85,37 @@ public class NioFileSystemAdapter implements DatastorePort {
       );
       log.info("Datastore deleted: {}", datastorePath);
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to delete Datastore: " + datastorePath + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException(
+        "Failed to delete Datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
+        e
+      );
       //TODO Exception
     }
   }
 
   @Override
-  public Set<Path> listAllFiles(RewriteId rewriteId) throws FileSystemOperationException { // Changement
+  public Set<Path> listAllFiles(RewriteId rewriteId) throws FileSystemOperationException {
     Assert.notNull(REWRITE_ID, rewriteId);
     Path datastorePath = getPathFromRewriteId(rewriteId);
     if (!Files.isDirectory(datastorePath)) {
-      throw new FileSystemOperationException("Path must be a directory: " + datastorePath); // Ou IllegalArgumentException si c'est une validation de paramètre
+      throw new FileSystemOperationException("Path must be a directory: " + rewriteConfig.maskWorkdirectory(datastorePath));
       //TODO Exception
     }
     try (Stream<Path> walk = Files.walk(datastorePath)) {
       return walk.filter(Files::isRegularFile).collect(Collectors.toSet());
     } catch (IOException e) {
-      throw new FileSystemOperationException("Failed to list files in datastore: " + datastorePath + ". " + e.getMessage(), e);
+      throw new FileSystemOperationException(
+        "Failed to list files in datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
+        e
+      );
       //TODO Exception
     }
+  }
+
+  @Override
+  public boolean exists(RewriteId id) {
+    Path datastorePath = getPathFromRewriteId(id);
+    return Files.exists(datastorePath);
   }
 
   @Override
@@ -109,6 +125,9 @@ public class NioFileSystemAdapter implements DatastorePort {
     if (!Files.exists(datastorePath)) {
       throw new DatastoreNotFoundException(rewriteId);
     }
-    return Datastore.from(rewriteId, rewriteConfig.resolve(rewriteId), listAllFiles(rewriteId));
+    if (!Files.isDirectory(datastorePath)) {
+      throw new DatastoreNotValidException(rewriteId);
+    }
+    return Datastore.from(rewriteId);
   }
 }

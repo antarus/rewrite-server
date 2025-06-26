@@ -10,9 +10,13 @@ import fr.rewrite.server.domain.state.RewriteConfig;
 import fr.rewrite.server.domain.state.State;
 import fr.rewrite.server.domain.state.StateRepository;
 import fr.rewrite.server.shared.error.domain.Assert;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +88,23 @@ public class JsonFileSystemRepository implements StateRepository {
         log.debug("No data found for delete ID '{}' in '{}'", id, filePath);
       }
     } catch (Exception e) {
+      throw new DataAccessException(e.getMessage(), e);
+      //TODO
+    }
+  }
+
+  @Override
+  public Collection<RewriteId> getAll() throws DataAccessException {
+    try (Stream<Path> walk = Files.walk(rewriteConfig.configDirectory(), 1)) {
+      return walk
+        .filter(Files::isRegularFile)
+        .filter(p -> p.getFileName().toString().endsWith(".json"))
+        .map(p -> {
+          String fileName = p.getFileName().toString();
+          return RewriteId.from(UUID.fromString(fileName.substring(0, fileName.lastIndexOf(".json"))));
+        })
+        .toList();
+    } catch (IOException e) {
       throw new DataAccessException(e.getMessage(), e);
       //TODO
     }

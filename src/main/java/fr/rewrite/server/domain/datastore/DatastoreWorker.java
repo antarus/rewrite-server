@@ -2,7 +2,7 @@ package fr.rewrite.server.domain.datastore;
 
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.ddd.DomainService;
-import fr.rewrite.server.domain.spi.EventBusPort;
+import fr.rewrite.server.domain.events.EventBusPort;
 
 @DomainService
 public class DatastoreWorker {

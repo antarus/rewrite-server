@@ -16,8 +16,11 @@ class RewriteConfiguration {
   @Value("${rewrite.server.config}")
   private String configDirectory;
 
+  @Value("${rewrite.server.mvn-path}")
+  private String mvnPath;
+
   @Bean
   public RewriteConfig rewriteConfig() {
-    return aRewriteConfig().configDirectory(configDirectory).workDirectory(workDirectory).build();
+    return aRewriteConfig().configDirectory(configDirectory).workDirectory(workDirectory).mvnPath(mvnPath).build();
   }
 }

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import fr.rewrite.server.UnitTest;
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.events.DomainEvent;
-import fr.rewrite.server.domain.events.LoggingEvent;
 import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import java.io.IOException;
 import java.time.Instant;
@@ -45,22 +44,22 @@ class DomainEventJacksonModuleTest {
     System.out.println("Serialized RepositoryCreatedEvent:\n" + json);
 
     assertThat(json).contains("\"@type\" : \"" + RepositoryClonedEvent.class.getSimpleName() + "\"");
-    assertThat(json).contains("\"rewriteId\" : \"72995000-df51-4fc8-ad40-28f29a1bf54d\"");
+    assertThat(json).contains("\"rewriteId\" :");
     assertThat(json).contains("eventId");
     assertThat(json).contains("occurredOn");
   }
 
   @Test
-  @DisplayName("Serialization should include @class property for LoggingEvent")
-  void serialization_shouldIncludeTypeInfoForLoggingEvent() throws JsonProcessingException {
-    LoggingEvent event = LoggingEvent.from("Application started.");
+  @DisplayName("Serialization should include @type property for RepositoryClonedEvent")
+  void serialization_shouldIncludeTypeInfoForRepositoryClonedEvent() throws JsonProcessingException {
+    RepositoryClonedEvent event = RepositoryClonedEvent.from(RewriteId.from(UUID.randomUUID()));
 
     String json = objectMapper.writeValueAsString(event);
 
-    System.out.println("Serialized LoggingEvent:\n" + json);
+    System.out.println("Serialized RepositoryClonedEvent:\n" + json);
 
-    assertThat(json).contains("\"@type\" : \"" + LoggingEvent.class.getSimpleName() + "\"");
-    assertThat(json).contains("\"log\" : \"Application started.\"");
+    assertThat(json).contains("\"@type\" : \"" + RepositoryClonedEvent.class.getSimpleName() + "\"");
+    assertThat(json).contains("\"rewriteId\" : ");
   }
 
   @Test
@@ -87,24 +86,27 @@ class DomainEventJacksonModuleTest {
   }
 
   @Test
-  @DisplayName("Deserialization should correctly resolve LoggingEvent by @class property")
-  void deserialization_shouldResolveLoggingEvent() throws IOException {
+  @DisplayName("Deserialization should correctly resolve RepositoryClonedEvent by @class property")
+  void deserialization_shouldResolveRepositoryClonedEvent() throws IOException {
     String json =
       """
       {
         "@type": "%s",
         "eventId": "af028d76-0330-46d8-969a-4f57346e104e",
         "occurredOn": "%s",
-        "log": "deserialized log message"
+        "rewriteId" : {
+           "uuid" : "474e9692-d35c-41d4-86eb-6e144066c852"
+         }
       }
-      """.formatted(LoggingEvent.class.getSimpleName(), Instant.now().minusSeconds(10));
+      """.formatted(RepositoryClonedEvent.class.getSimpleName(), Instant.now().minusSeconds(10));
     DomainEvent deserializedEvent = objectMapper.readValue(json, DomainEvent.class);
 
     assertNotNull(deserializedEvent);
-    assertThat(deserializedEvent).isInstanceOf(LoggingEvent.class);
-    LoggingEvent logEvent = (LoggingEvent) deserializedEvent;
+    assertThat(deserializedEvent).isInstanceOf(RepositoryClonedEvent.class);
+    RepositoryClonedEvent event = (RepositoryClonedEvent) deserializedEvent;
 
-    assertThat(logEvent.eventId()).isEqualTo(UUID.fromString("af028d76-0330-46d8-969a-4f57346e104e"));
+    assertThat(event.eventId()).isEqualTo(UUID.fromString("af028d76-0330-46d8-969a-4f57346e104e"));
+    assertThat(event.rewriteId()).isEqualTo(RewriteId.from(UUID.fromString("474e9692-d35c-41d4-86eb-6e144066c852")));
   }
 
   @Test

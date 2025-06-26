@@ -1,6 +1,8 @@
 package fr.rewrite.server.infrastructure.secondary.job;
 
 import fr.rewrite.server.domain.RewriteId;
+import fr.rewrite.server.domain.build.BuildWorker;
+import fr.rewrite.server.domain.datastore.Datastore;
 import fr.rewrite.server.domain.datastore.DatastoreWorker;
 import fr.rewrite.server.domain.repository.Credentials;
 import fr.rewrite.server.domain.repository.RepositoryURL;
@@ -15,14 +17,21 @@ import org.springframework.stereotype.Component;
 @Profile("jobrunr")
 public class JobRunrSchedulerAdapter implements JobSchedulerPort, JobPort {
 
-  private final DatastoreWorker datastoreWorker;
   private final JobScheduler jobScheduler;
+  private final DatastoreWorker datastoreWorker;
   private final RepositoryWorker repositoryWorker;
+  private final BuildWorker buildWorker;
 
-  public JobRunrSchedulerAdapter(DatastoreWorker datastoreWorker, JobScheduler jobScheduler, RepositoryWorker repositoryWorker) {
+  public JobRunrSchedulerAdapter(
+    DatastoreWorker datastoreWorker,
+    JobScheduler jobScheduler,
+    RepositoryWorker repositoryWorker,
+    BuildWorker buildWorker
+  ) {
     this.datastoreWorker = datastoreWorker;
     this.jobScheduler = jobScheduler;
     this.repositoryWorker = repositoryWorker;
+    this.buildWorker = buildWorker;
   }
 
   @Override
@@ -38,5 +47,15 @@ public class JobRunrSchedulerAdapter implements JobSchedulerPort, JobPort {
   @Override
   public void cloneRepository(RepositoryURL repositoryURL) {
     jobScheduler.enqueue(RewriteId.from(repositoryURL).get(), () -> repositoryWorker.cloneARepository(repositoryURL));
+  }
+
+  @Override
+  public void createBranch(RewriteId rewriteId, String currentBranch) {
+    jobScheduler.enqueue(rewriteId.get(), () -> repositoryWorker.createBranch(rewriteId, currentBranch));
+  }
+
+  @Override
+  public void buildProject(Datastore datastore) {
+    jobScheduler.enqueue(datastore.rewriteId().get(), () -> buildWorker.buildProject(datastore));
   }
 }

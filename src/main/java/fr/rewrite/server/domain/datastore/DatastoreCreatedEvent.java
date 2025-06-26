@@ -1,18 +1,21 @@
 package fr.rewrite.server.domain.datastore;
 
-import static fr.rewrite.server.domain.datastore.DatastoreCreatedEvent.DatastoreCreatedEventBuilder.aRepositoryCreatedEvent;
+import static fr.rewrite.server.domain.datastore.DatastoreCreatedEvent.DatastoreCreatedEventBuilder.aDatastoreCreatedEvent;
 
 import fr.rewrite.server.domain.RewriteId;
 import fr.rewrite.server.domain.events.DomainEvent;
+import fr.rewrite.server.domain.repository.RepositoryClonedEvent;
 import fr.rewrite.server.shared.error.domain.Assert;
 import java.time.Instant;
 import java.util.UUID;
 
 public record DatastoreCreatedEvent(UUID eventId, RewriteId rewriteId, Instant occurredOn) implements DomainEvent {
+  public static final String REWRITE_ID = "rewriteId";
+
   public DatastoreCreatedEvent {
     Assert.notNull("eventId", eventId);
     Assert.field("occurredOn", occurredOn).inPast();
-    Assert.notNull("rewriteId", rewriteId);
+    Assert.notNull(REWRITE_ID, rewriteId);
   }
 
   protected static final class DatastoreCreatedEventBuilder {
@@ -23,7 +26,7 @@ public record DatastoreCreatedEvent(UUID eventId, RewriteId rewriteId, Instant o
 
     private DatastoreCreatedEventBuilder() {}
 
-    static DatastoreCreatedEventBuilder aRepositoryCreatedEvent() {
+    static DatastoreCreatedEventBuilder aDatastoreCreatedEvent() {
       return new DatastoreCreatedEventBuilder();
     }
 
@@ -34,7 +37,13 @@ public record DatastoreCreatedEvent(UUID eventId, RewriteId rewriteId, Instant o
       if (this.occurredOn == null) {
         occurredOn = Instant.now();
       }
+      Assert.notNull(REWRITE_ID, rewriteId);
       return new DatastoreCreatedEvent(eventId, rewriteId, occurredOn);
+    }
+
+    DatastoreCreatedEventBuilder rewriteId(UUID rewriteId) {
+      this.rewriteId = RewriteId.from(rewriteId);
+      return this;
     }
 
     DatastoreCreatedEventBuilder rewriteId(RewriteId rewriteId) {
@@ -44,6 +53,7 @@ public record DatastoreCreatedEvent(UUID eventId, RewriteId rewriteId, Instant o
   }
 
   public static DatastoreCreatedEvent from(RewriteId rewriteId) {
-    return aRepositoryCreatedEvent().rewriteId(rewriteId).build();
+    Assert.notNull(REWRITE_ID, rewriteId);
+    return aDatastoreCreatedEvent().rewriteId(rewriteId).build();
   }
 }
