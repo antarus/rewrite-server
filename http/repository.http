@@ -1,4 +1,3 @@
-// test valide
 POST https://{{host}}/api/repository/clone
 Content-Type: application/json
 

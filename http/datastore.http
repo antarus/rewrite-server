@@ -1,16 +1,15 @@
-// test valide
 POST https://{{host}}/api/datastore
 Content-Type: application/json
 
 { "url" : "https://github.com/antarus/jhipster-lite" }
 ###
-// test valide
+
 POST https://{{host}}/api/datastore
 Content-Type: application/json
 
 { "url" : "https://github.com/jhipster/jhipster-lite" }
 ###
-// test invalide
+
 POST https://{{host}}/api/datastore
 Content-Type: application/json
 
