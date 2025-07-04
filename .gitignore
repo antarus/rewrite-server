@@ -135,3 +135,5 @@ Desktop.ini
 # Maven Wrapper
 !.mvn/wrapper/maven-wrapper.jar
 GEMINI.md
+http/http-client.private.env.json
+

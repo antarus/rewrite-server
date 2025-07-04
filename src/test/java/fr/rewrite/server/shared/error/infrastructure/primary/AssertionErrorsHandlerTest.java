@@ -27,7 +27,7 @@ class AssertionErrorsHandlerTest {
   void shouldLogPrimaryAssertionExceptionInInfo() {
     handler.handleAssertionError(new DefaultAssertionException());
 
-    logs.shouldHave(Level.INFO, "Oops");
+    logs.shouldHave(Level.WARN, "Oops");
   }
 
   @Test

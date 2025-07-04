@@ -5,6 +5,7 @@ import fr.rewrite.server.shared.error.domain.AssertionException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ class AssertionErrorsHandler {
       .map(StackTraceElement::getClassName)
       .filter(inApplication())
       .filter(notInErrorDomain())
+      .filter(notInDomain())
       .findFirst()
       .filter(primaryClass())
       .map(className -> HttpStatus.BAD_REQUEST)
@@ -64,6 +66,10 @@ class AssertionErrorsHandler {
 
   private Predicate<String> notInErrorDomain() {
     return className -> !className.startsWith("fr.rewrite.server.shared.error.domain");
+  }
+
+  private Predicate<String> notInDomain() {
+    return className -> !className.startsWith("fr.rewrite.server.domain");
   }
 
   private Predicate<String> primaryClass() {
@@ -93,7 +99,11 @@ class AssertionErrorsHandler {
 
   private void logException(AssertionException exception, HttpStatus status) {
     if (status.is4xxClientError()) {
-      log.info(exception.getMessage(), exception);
+      if (status.value() == 404 || status.value() == 400) {
+        log.warn(exception.getMessage());
+      } else {
+        log.warn(exception.getMessage(), exception);
+      }
     } else {
       log.error(exception.getMessage(), exception);
     }

@@ -1,17 +1,20 @@
 package fr.rewrite.server.domain.datastore;
 
-import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.exception.FileSystemOperationException;
 import java.nio.file.Path;
 import java.util.Set;
+import org.jmolecules.architecture.hexagonal.Port;
 
+@Port
 public interface DatastorePort {
-  void createDatastore(RewriteId id) throws FileSystemOperationException;
-  void deleteDatastore(RewriteId id) throws FileSystemOperationException;
+  void provisionDatastore(DatastoreId id) throws DatastoreOperationException;
+  void deleteDatastore(DatastoreId id) throws DatastoreOperationException;
 
-  Datastore getDatastore(RewriteId id);
+  void deleteRepository(DatastoreId datastoreId);
 
-  Set<Path> listAllFiles(RewriteId id) throws FileSystemOperationException;
+  boolean saveObjectToDsCache(DatastoreId ds, String filename, DatastoreSavable object);
+  DatastoreSavable getObjectToDsCache(DatastoreId ds, String filename);
 
-  boolean exists(RewriteId id);
+  Set<Path> listAllFiles(DatastoreId datastoreId) throws DatastoreOperationException;
+
+  boolean exists(DatastoreId id);
 }

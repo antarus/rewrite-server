@@ -1,12 +1,15 @@
 package fr.rewrite.server.infrastructure.secondary.filesystem;
 
-import fr.rewrite.server.domain.RewriteId;
-import fr.rewrite.server.domain.datastore.Datastore;
-import fr.rewrite.server.domain.datastore.DatastoreNotFoundException;
-import fr.rewrite.server.domain.datastore.DatastoreNotValidException;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.rewrite.server.domain.RewriteConfig;
+import fr.rewrite.server.domain.datastore.DatastoreId;
+import fr.rewrite.server.domain.datastore.DatastoreOperationException;
 import fr.rewrite.server.domain.datastore.DatastorePort;
-import fr.rewrite.server.domain.exception.FileSystemOperationException;
-import fr.rewrite.server.domain.state.RewriteConfig;
+import fr.rewrite.server.domain.datastore.DatastoreSavable;
+import fr.rewrite.server.domain.log.CleanSensitiveLog;
+import fr.rewrite.server.domain.log.LogPublisher;
 import fr.rewrite.server.shared.error.domain.Assert;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -19,115 +22,179 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NioFileSystemAdapter implements DatastorePort {
 
   public static final String REWRITE_ID = "rewriteId";
+  public static final String DATASTORE_ID = "datastoreId";
   private static final Logger log = LoggerFactory.getLogger(NioFileSystemAdapter.class);
-
+  private final LogPublisher logPublisher;
   private final RewriteConfig rewriteConfig;
+  private final ObjectMapper objectMapper;
+  private final CleanSensitiveLog cleanSensitiveLog;
 
-  public NioFileSystemAdapter(RewriteConfig rewriteConfig) {
+  public NioFileSystemAdapter(
+    LogPublisher logPublisher,
+    RewriteConfig rewriteConfig,
+    @Qualifier("objectMapperDs") ObjectMapper objectMapper,
+    CleanSensitiveLog cleanSensitiveLog
+  ) {
     Assert.notNull("rewriteConfig", rewriteConfig);
+    this.logPublisher = logPublisher;
+    this.objectMapper = objectMapper;
+    this.cleanSensitiveLog = cleanSensitiveLog;
+
     this.rewriteConfig = rewriteConfig;
   }
 
-  private Path getPathFromRewriteId(RewriteId rewriteId) {
-    Assert.notNull(REWRITE_ID, rewriteId);
-    return rewriteConfig.resolve(rewriteId);
+  private Path getPathDsFromDatastoreId(DatastoreId datastoreId) {
+    Assert.notNull(DATASTORE_ID, datastoreId);
+    return rewriteConfig.resolveDs(datastoreId);
   }
 
   @Override
-  public void createDatastore(RewriteId rewriteId) throws FileSystemOperationException {
-    Assert.notNull(REWRITE_ID, rewriteId);
-    Path datastorePath = getPathFromRewriteId(rewriteId);
-    log.debug("Creating datastore {}", rewriteConfig.maskWorkdirectory(datastorePath));
+  public void provisionDatastore(DatastoreId datastoreId) throws DatastoreOperationException {
+    Assert.notNull(DATASTORE_ID, datastoreId);
+    Path datastorePath = getPathDsFromDatastoreId(datastoreId);
+
+    logPublisher.debug("Creating datastore " + datastorePath, datastoreId);
 
     try {
       Files.createDirectories(datastorePath);
-      log.info("Directory created: {}", datastorePath);
+
+      logPublisher.info("Directory created: " + datastorePath, datastoreId);
+
+      Files.createDirectories(Path.of(datastorePath.toString(), rewriteConfig.dsCache()));
+      Files.createDirectories(Path.of(datastorePath.toString(), rewriteConfig.dsRepository()));
     } catch (IOException e) {
-      throw new FileSystemOperationException(
-        "Failed to create datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
-        e
-      );
-      //TODO Exception
+      throw new DatastoreOperationException("Failed to create datastore: " + datastorePath + ". ", e);
     }
   }
 
   @Override
-  public void deleteDatastore(RewriteId rewriteId) throws FileSystemOperationException {
-    Assert.notNull(REWRITE_ID, rewriteId);
-    Path datastorePath = getPathFromRewriteId(rewriteId);
+  public void deleteDatastore(DatastoreId datastoreId) {
+    Assert.notNull(DATASTORE_ID, datastoreId);
+    Path datastorePath = getPathDsFromDatastoreId(datastoreId);
     if (!Files.exists(datastorePath)) {
-      log.warn("Datastore does not exist, skipping deletion: {}", rewriteConfig.maskWorkdirectory(datastorePath));
+      logPublisher.warn("Datastore does not exist, skipping deletion: " + datastorePath, datastoreId);
       return;
-      //TODO Exception
     }
     try {
-      Files.walkFileTree(
-        datastorePath,
-        new SimpleFileVisitor<>() {
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            Files.delete(dir);
-            return FileVisitResult.CONTINUE;
-          }
-        }
-      );
-      log.info("Datastore deleted: {}", datastorePath);
+      deleteRecursively(datastorePath);
+      logPublisher.info("Datastore deleted: " + datastorePath, datastoreId);
     } catch (IOException e) {
-      throw new FileSystemOperationException(
-        "Failed to delete Datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
-        e
-      );
-      //TODO Exception
+      throw new DatastoreOperationException("Failed to delete Datastore: " + datastorePath + ". " + e.getMessage(), e);
     }
   }
 
   @Override
-  public Set<Path> listAllFiles(RewriteId rewriteId) throws FileSystemOperationException {
-    Assert.notNull(REWRITE_ID, rewriteId);
-    Path datastorePath = getPathFromRewriteId(rewriteId);
+  public void deleteRepository(DatastoreId datastoreId) {
+    Assert.notNull(DATASTORE_ID, datastoreId);
+    Path datastorePath = getPathDsFromDatastoreId(datastoreId);
+    Path repositoryPath = Path.of(datastorePath.toString(), rewriteConfig.dsRepository());
+    if (!Files.exists(repositoryPath)) {
+      if (log.isWarnEnabled()) {
+        logPublisher.warn(
+          "Repository does not exist in datastore " + datastorePath + " , skipping deletion repository : " + repositoryPath,
+          datastoreId
+        );
+      }
+      return;
+    }
+    try {
+      deleteRecursively(repositoryPath);
+      log.info("Repository deleted: {}", repositoryPath);
+    } catch (IOException e) {
+      throw new DatastoreOperationException(
+        "Failed to delete Repository: " + repositoryPath + " in Datastore " + datastorePath + ". " + e.getMessage(),
+        e
+      );
+    }
+  }
+
+  private void deleteRecursively(Path repositoryPath) throws IOException {
+    Files.walkFileTree(
+      repositoryPath,
+      new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          Files.delete(file);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          Files.delete(dir);
+          return FileVisitResult.CONTINUE;
+        }
+      }
+    );
+  }
+
+  @Override
+  public Set<Path> listAllFiles(DatastoreId datastoreId) {
+    Assert.notNull(DATASTORE_ID, datastoreId);
+    Path datastorePath = getPathDsFromDatastoreId(datastoreId);
     if (!Files.isDirectory(datastorePath)) {
-      throw new FileSystemOperationException("Path must be a directory: " + rewriteConfig.maskWorkdirectory(datastorePath));
-      //TODO Exception
+      throw new DatastoreOperationException("Path must be a directory: " + datastorePath);
     }
     try (Stream<Path> walk = Files.walk(datastorePath)) {
       return walk.filter(Files::isRegularFile).collect(Collectors.toSet());
     } catch (IOException e) {
-      throw new FileSystemOperationException(
-        "Failed to list files in datastore: " + rewriteConfig.maskWorkdirectory(datastorePath) + ". " + e.getMessage(),
+      throw new DatastoreOperationException(
+        cleanSensitiveLog.clean("Failed to list files in datastore: " + datastorePath + ". " + e.getMessage()),
         e
       );
-      //TODO Exception
     }
   }
 
   @Override
-  public boolean exists(RewriteId id) {
-    Path datastorePath = getPathFromRewriteId(id);
+  public boolean exists(DatastoreId id) {
+    Path datastorePath = getPathDsFromDatastoreId(id);
     return Files.exists(datastorePath);
   }
 
   @Override
-  public Datastore getDatastore(RewriteId rewriteId) {
-    Assert.notNull(REWRITE_ID, rewriteId);
-    Path datastorePath = getPathFromRewriteId(rewriteId);
-    if (!Files.exists(datastorePath)) {
-      throw new DatastoreNotFoundException(rewriteId);
+  public boolean saveObjectToDsCache(DatastoreId dsId, String filename, DatastoreSavable object) {
+    Assert.notNull("filename", filename);
+    Assert.notNull("object", object);
+
+    Path dsPath = rewriteConfig.resolveDsCache(dsId);
+
+    try {
+      Path filePath = dsPath.resolve(filename);
+      objectMapper.writeValue(filePath.toFile(), object);
+
+      logPublisher.debug(String.format("Save Object in file '%s'", filePath), dsId);
+
+      return true;
+    } catch (Exception e) {
+      throw new DatastoreOperationException(e.getMessage(), e);
     }
-    if (!Files.isDirectory(datastorePath)) {
-      throw new DatastoreNotValidException(rewriteId);
+  }
+
+  @Override
+  public DatastoreSavable getObjectToDsCache(DatastoreId dsId, String filename) {
+    Assert.notNull("filename", filename);
+
+    Path dsPath = rewriteConfig.resolveDsCache(dsId);
+
+    try {
+      Path filePath = dsPath.resolve(filename);
+
+      JsonFactory jfactory = new JsonFactory();
+      JsonParser jParser = jfactory.createParser(filePath.toFile());
+
+      DatastoreSavable datastoreSavable = objectMapper.readValue(jParser, DatastoreSavable.class);
+
+      logPublisher.debug(String.format("Get '%s' from file '%s'", datastoreSavable, dsPath), dsId);
+
+      return datastoreSavable;
+    } catch (Exception e) {
+      throw new DatastoreOperationException(e.getMessage(), e);
     }
-    return Datastore.from(rewriteId);
   }
 }

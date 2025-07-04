@@ -7,6 +7,7 @@ import fr.rewrite.server.Logs;
 import fr.rewrite.server.LogsSpy;
 import fr.rewrite.server.LogsSpyExtension;
 import fr.rewrite.server.UnitTest;
+import fr.rewrite.server.domain.log.LogPublisher;
 import fr.rewrite.server.shared.error.domain.RewriteServerException;
 import fr.rewrite.server.shared.error.domain.StandardErrorKey;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,10 @@ import org.springframework.context.MessageSource;
 @ExtendWith(LogsSpyExtension.class)
 class RewriteServerErrorsHandlerTest {
 
-  private static final RewriteServerErrorsHandler handler = new RewriteServerErrorsHandler(mock(MessageSource.class));
+  private static final RewriteServerErrorsHandler handler = new RewriteServerErrorsHandler(
+    mock(LogPublisher.class),
+    mock(MessageSource.class)
+  );
 
   @Logs
   private LogsSpy logs;

@@ -1,19 +1,37 @@
 // test valide
-POST https://{{host}}/api/rewrite/repository/clone
+POST https://{{host}}/api/repository/clone
 Content-Type: application/json
 
-{ "url" : "https://github.com/antarus/jhipster-lite",
+{
+ "datastoreId": {
+   "uuid": "904d1170-4bd7-3324-8139-95115b43bbe4"
+ },
+  "url" : "https://github.com/antarus/jhipster-lite",
 "credential": {
-  "username": "antarus",
-  "pat": "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"
+  "username": {{ github.username }},
+  "pat": {{ github.pat }}
 }
 }
 
 ###
 
-POST https://{{host}}/api/rewrite/repository/904d1170-4bd7-3324-8139-95115b43bbe4/branch
+DELETE https://{{host}}/api/repository/delete
 Content-Type: application/json
 
 {
+ "datastoreId": {
+   "uuid": "904d1170-4bd7-3324-8139-95115b43bbe4"
+ }
+}
+
+###
+
+POST https://{{host}}/api/repository/branch
+Content-Type: application/json
+
+{
+  "datastoreId": {
+    "uuid": "904d1170-4bd7-3324-8139-95115b43bbe4"
+  },
   "name": "feat/test"
 }

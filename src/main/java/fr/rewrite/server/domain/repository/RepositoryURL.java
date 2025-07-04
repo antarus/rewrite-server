@@ -19,14 +19,14 @@ public record RepositoryURL(String url) {
   public static final String OWNER = "owner";
 
   public RepositoryURL {
-    Assert.field("value", url).notBlank();
+    Assert.field("url", url).notBlank();
     if (!isValidUrl(url)) {
       throw new RepositoryInvalidUrlException(url);
     }
   }
 
-  public static RepositoryURL from(String value) {
-    return new RepositoryURL(value);
+  public static RepositoryURL from(String url) {
+    return new RepositoryURL(url);
   }
   public String get() {
     return url;

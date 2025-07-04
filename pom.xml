@@ -40,6 +40,7 @@
     <openrewrite.version>8.55.3</openrewrite.version>
     <archunit-junit5.version>1.4.1</archunit-junit5.version>
     <git-commit-id-plugin.version>9.0.2</git-commit-id-plugin.version>
+    <jmolecules-bom.version>2023.2.1</jmolecules-bom.version>
   </properties>
 
   <dependencyManagement>
@@ -48,6 +49,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jmolecules</groupId>
+        <artifactId>jmolecules-bom</artifactId>
+        <version>${jmolecules-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -154,7 +162,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>6.2.7</version>
+    </dependency>
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
@@ -183,45 +195,46 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jmolecules</groupId>
+      <artifactId>jmolecules-ddd</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jmolecules</groupId>
+      <artifactId>jmolecules-hexagonal-architecture</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jmolecules</groupId>
+      <artifactId>jmolecules-events</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jmolecules</groupId>
+      <artifactId>jmolecules-cqrs-architecture</artifactId>
+    </dependency>
     <!--    <dependency>-->
-    <!--      <groupId>org.projectlombok</groupId>-->
-    <!--      <artifactId>lombok</artifactId>-->
-    <!--      <version>1.18.30</version>-->
-    <!--      <scope>provided</scope>-->
+    <!--      <groupId>org.postgresql</groupId>-->
+    <!--      <artifactId>postgresql</artifactId>-->
+    <!--      <scope>runtime</scope>-->
     <!--    </dependency>-->
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-core</artifactId>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>com.zaxxer</groupId>-->
+    <!--      <artifactId>HikariCP</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.springframework.boot</groupId>-->
+    <!--      <artifactId>spring-boot-starter-data-jpa</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.hibernate.orm</groupId>-->
+    <!--      <artifactId>hibernate-core</artifactId>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-amqp</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -229,11 +242,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.jobrunr</groupId>
-      <artifactId>jobrunr-spring-boot-3-starter</artifactId>
-      <version>7.5.1</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>

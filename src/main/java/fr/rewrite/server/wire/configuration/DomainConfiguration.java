@@ -1,19 +1,27 @@
 package fr.rewrite.server.wire.configuration;
 
-import fr.rewrite.server.domain.build.BuildWorker;
-import fr.rewrite.server.domain.datastore.DatastoreWorker;
+import fr.rewrite.server.domain.RewriteConfig;
+import fr.rewrite.server.domain.build.BuildDomainService;
+import fr.rewrite.server.domain.datastore.DatastoreDomainService;
 import fr.rewrite.server.domain.ddd.DomainService;
 import fr.rewrite.server.domain.ddd.Stub;
-import fr.rewrite.server.domain.events.DomainEventHandlerService;
-import fr.rewrite.server.domain.repository.RepositoryWorker;
+import fr.rewrite.server.domain.log.CleanSensitiveLog;
+import fr.rewrite.server.domain.log.LogPublisher;
+import fr.rewrite.server.domain.repository.RepositoryDomainService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 
 @Configuration
 @ComponentScan(
-  basePackageClasses = { DatastoreWorker.class, RepositoryWorker.class, BuildWorker.class, DomainEventHandlerService.class },
+  basePackageClasses = { DatastoreDomainService.class, RepositoryDomainService.class, BuildDomainService.class, LogPublisher.class },
   includeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = { DomainService.class, Stub.class }) }
 )
-//        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {Stub.class})})
-class DomainConfiguration {}
+class DomainConfiguration {
+
+  @Bean
+  public CleanSensitiveLog cleanSensitiveLog(RewriteConfig config) {
+    return new CleanSensitiveLog(config);
+  }
+}

@@ -1,0 +1,19 @@
+GET https://{{host}}/management
+###
+GET https://{{host}}/management/beans
+###
+GET https://{{host}}/management/caches
+###
+GET https://{{host}}/management/health
+###
+GET https://{{host}}/management/info
+###
+GET https://{{host}}/management/env
+###
+GET https://{{host}}/management/loggers
+###
+GET https://{{host}}/management/heapdump
+###
+GET https://{{host}}/management/threaddump
+###
+GET https://{{host}}/management/metrics

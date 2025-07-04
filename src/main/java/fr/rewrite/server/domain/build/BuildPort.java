@@ -1,10 +1,14 @@
 package fr.rewrite.server.domain.build;
 
-import fr.rewrite.server.domain.datastore.Datastore;
-import fr.rewrite.server.domain.exception.BuildToolException;
+import fr.rewrite.server.domain.datastore.DatastoreId;
+
+import java.nio.file.Path;
+import java.util.Set;
 
 public interface BuildPort {
-  void buildProject(Datastore datastore) throws BuildToolException;
 
-//  Set<Path> getProjectClasspath(Path projectDir, Path outputPath, String mavenExecutablePath) throws BuildToolException;
+  void buildProject(DatastoreId datastoreId) ;
+  Set<Path>  getClassPath(DatastoreId datastoreId);
+
+
 }

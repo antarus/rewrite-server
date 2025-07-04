@@ -1,17 +1,32 @@
 // test valide
-POST https://{{host}}/api/rewrite/datastore
+POST https://{{host}}/api/datastore
 Content-Type: application/json
 
 { "url" : "https://github.com/antarus/jhipster-lite" }
 ###
+// test valide
+POST https://{{host}}/api/datastore
+Content-Type: application/json
+
+{ "url" : "https://github.com/jhipster/jhipster-lite" }
+###
 // test invalide
-POST https://{{host}}/api/rewrite/datastore
+POST https://{{host}}/api/datastore
 Content-Type: application/json
 
 {  }
 ###
 
-GET https://{{host}}/api/rewrite/datastore/904d1170-4bd7-3324-8139-95115b43bbe4
+GET https://{{host}}/api/datastore
+
+
 ###
 
-GET https://{{host}}/api/rewrite/datastore/904d1170-4bd7-3324-8139-95115b43bbef
+GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4
+###
+
+GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4/history
+###
+
+
+GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbef

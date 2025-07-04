@@ -1,5 +1,6 @@
 package fr.rewrite.server.shared.error.infrastructure.primary;
 
+import fr.rewrite.server.domain.log.LogPublisher;
 import fr.rewrite.server.shared.enumeration.domain.Enums;
 import fr.rewrite.server.shared.error.domain.ErrorKey;
 import fr.rewrite.server.shared.error.domain.RewriteServerException;
@@ -25,13 +26,14 @@ class RewriteServerErrorsHandler {
 
   private static final Logger log = LoggerFactory.getLogger(RewriteServerErrorsHandler.class);
   private static final String MESSAGES_PREFIX = "error.";
-
+  private final LogPublisher logPublisher;
   private final MessageSource messages;
 
   @Value("${developer.mode}")
   private boolean developerMode = false;
 
-  public RewriteServerErrorsHandler(@Qualifier("applicationErrorMessageSource") MessageSource messages) {
+  public RewriteServerErrorsHandler(LogPublisher logPublisher, @Qualifier("applicationErrorMessageSource") MessageSource messages) {
+    this.logPublisher = logPublisher;
     Locale.setDefault(Locale.ENGLISH);
 
     this.messages = messages;
@@ -47,7 +49,7 @@ class RewriteServerErrorsHandler {
     problem.setProperty("key", exception.key().get());
 
     logException(message, exception, status);
-
+    //logPublisher.error(message);
     return problem;
   }
 
