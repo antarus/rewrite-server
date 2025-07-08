@@ -11,11 +11,16 @@ import fr.rewrite.server.domain.datastore.projections.currentstate.DatastoreCurr
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import fr.rewrite.server.shared.error.domain.Assert;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
@@ -29,8 +34,7 @@ class DatastoreQueryController {
   }
 
   @GetMapping("/{uuid}")
-  public ResponseEntity<RestDatastoreCurrentState> get(@PathVariable(value = "uuid") UUID uuid)
-    throws ExecutionException, InterruptedException {
+  public ResponseEntity<RestDatastoreCurrentState> get(@PathVariable(value = "uuid") UUID uuid) {
     DatastoreId datastoreId = new DatastoreId(uuid);
     RestDatastoreCurrentState currentState = dataStore
       .getCurrentState(datastoreId)
@@ -45,8 +49,7 @@ class DatastoreQueryController {
   }
 
   @GetMapping("/{uuid}/history")
-  public ResponseEntity<RestDatastoreHistory> getHistory(@PathVariable(value = "uuid") UUID uuid)
-    throws ExecutionException, InterruptedException {
+  public ResponseEntity<RestDatastoreHistory> getHistory(@PathVariable(value = "uuid") UUID uuid) {
     DatastoreId datastoreId = new DatastoreId(uuid);
     return ResponseEntity.ok(RestDatastoreHistory.fromDomain(dataStore.getHistory(datastoreId)));
   }

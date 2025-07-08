@@ -6,7 +6,6 @@ import fr.rewrite.server.domain.datastore.DatastoreId;
 import fr.rewrite.server.domain.datastore.event.DatastoreCreated;
 import fr.rewrite.server.domain.datastore.event.DatastoreEvent;
 import fr.rewrite.server.domain.datastore.event.DatastoreHistory;
-import fr.rewrite.server.infrastructure.secondary.repository.JGitAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

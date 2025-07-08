@@ -28,7 +28,7 @@ public class RecipeLister {
       .stream()
       .map(Recipe::getDescriptor) // Convertit chaque Recipe en RecipeDescriptor
       .filter(rd -> !rd.getName().contains("test")) // Exclure les recettes de test
-      .collect(Collectors.toList());
+      .toList();
 
     // Tri et groupement par "catégorie" (basé sur le package de la recette)
     Map<String, List<RecipeDescriptor>> recipesByCategory = allRecipeDescriptors

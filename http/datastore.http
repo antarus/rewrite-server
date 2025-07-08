@@ -1,31 +1,31 @@
-POST https://{{host}}/api/datastore
+POST {{host}}:{{port}}/api/datastore
 Content-Type: application/json
 
 { "url" : "https://github.com/antarus/jhipster-lite" }
 ###
 
-POST https://{{host}}/api/datastore
+POST {{host}}:{{port}}/api/datastore
 Content-Type: application/json
 
 { "url" : "https://github.com/jhipster/jhipster-lite" }
 ###
 
-POST https://{{host}}/api/datastore
+POST {{host}}:{{port}}/api/datastore
 Content-Type: application/json
 
 {  }
 ###
 
-GET https://{{host}}/api/datastore
+GET {{host}}:{{port}}/api/datastore
 
 
 ###
 
-GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4
+GET {{host}}:{{port}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4
 ###
 
-GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4/history
+GET {{host}}:{{port}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbe4/history
 ###
 
 
-GET https://{{host}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbef
+GET {{host}}:{{port}}/api/datastore/904d1170-4bd7-3324-8139-95115b43bbef

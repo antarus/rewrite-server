@@ -76,3 +76,6 @@ done
 
 echo "Conversion terminée. Fichiers Java KeyStore (.p12) et TrustStore (.jks) générés."
 echo "N'oubliez pas de copier les fichiers nécessaires vers leurs emplacements respectifs et de mettre à jour vos configurations."
+
+echo "Copy CA root in your truststore use by your application. default :"
+echo "keytool -importcert -alias ca_rewrite -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -file $CA_CRT_ABSOLUTE_PATH -noprompt"

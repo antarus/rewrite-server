@@ -40,7 +40,9 @@
     <openrewrite.version>8.55.3</openrewrite.version>
     <archunit-junit5.version>1.4.1</archunit-junit5.version>
     <git-commit-id-plugin.version>9.0.2</git-commit-id-plugin.version>
-    <jmolecules-bom.version>2023.2.1</jmolecules-bom.version>
+    <jmolecules-bom.version>2023.3.2</jmolecules-bom.version>
+    <cucumber.version>7.23.0</cucumber.version>
+    <jmolecules.version>1.10.0</jmolecules.version>
   </properties>
 
   <dependencyManagement>
@@ -52,13 +54,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.jmolecules</groupId>
-        <artifactId>jmolecules-bom</artifactId>
-        <version>${jmolecules-bom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+
       <!-- dependency convergence fix -->
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -184,17 +180,17 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-      </exclusions>
+      <!--      <exclusions>-->
+      <!--        <exclusion>-->
+      <!--          <groupId>org.springframework.boot</groupId>-->
+      <!--          <artifactId>spring-boot-starter-tomcat</artifactId>-->
+      <!--        </exclusion>-->
+      <!--      </exclusions>-->
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-undertow</artifactId>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>org.springframework.boot</groupId>-->
+    <!--      <artifactId>spring-boot-starter-undertow</artifactId>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -203,18 +199,22 @@
     <dependency>
       <groupId>org.jmolecules</groupId>
       <artifactId>jmolecules-ddd</artifactId>
+      <version>${jmolecules.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jmolecules</groupId>
       <artifactId>jmolecules-hexagonal-architecture</artifactId>
+      <version>${jmolecules.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jmolecules</groupId>
       <artifactId>jmolecules-events</artifactId>
+      <version>${jmolecules.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jmolecules</groupId>
       <artifactId>jmolecules-cqrs-architecture</artifactId>
+      <version>${jmolecules.version}</version>
     </dependency>
     <!--    <dependency>-->
     <!--      <groupId>org.postgresql</groupId>-->
@@ -255,6 +255,29 @@
       <groupId>com.tngtech.archunit</groupId>
       <artifactId>archunit-junit5-api</artifactId>
       <version>${archunit-junit5.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-java</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-spring</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -523,6 +546,7 @@
             <include>**/*IntTest*</include>
             <include>**/*CucumberTest*</include>
           </includes>
+          <testFailureIgnore>false</testFailureIgnore>
         </configuration>
         <executions>
           <execution>

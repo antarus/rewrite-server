@@ -13,13 +13,6 @@ import org.junit.jupiter.api.Test;
 class DatastoreIdTest {
 
   @Test
-  void shouldCreateDatastoreIdFromUUID() {
-    UUID uuid = UUID.randomUUID();
-    DatastoreId datastoreId = DatastoreId.from(uuid);
-    assertThat(datastoreId.get()).isEqualTo(uuid);
-  }
-
-  @Test
   void shouldCreateDatastoreIdFromRepositoryURL() {
     RepositoryURL repositoryURL = new RepositoryURL("https://github.com/test/repo");
     DatastoreId datastoreId = DatastoreId.from(repositoryURL);

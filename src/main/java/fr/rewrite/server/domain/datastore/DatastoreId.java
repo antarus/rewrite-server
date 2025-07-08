@@ -12,9 +12,7 @@ public record DatastoreId(UUID uuid) {
     Assert.notNull("repositoryURL", repositoryURL);
     return new DatastoreId(UUID.nameUUIDFromBytes(repositoryURL.url().getBytes()));
   }
-  public static DatastoreId from(UUID uuid) {
-    return new DatastoreId(uuid);
-  }
+
   public UUID get() {
     return uuid();
   }

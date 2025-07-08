@@ -5,6 +5,9 @@ logging:
       fr:
         rewrite:
           server: INFO
+      org.apache.tomcat.util.net: DEBUG
+      org.springframework.boot.web.embedded.tomcat: DEBUG
+      org.springframework.boot.ssl: DEBUG
 
 spring:
   profiles:
@@ -24,47 +27,34 @@ spring:
       thread-name-prefix: async-task-
   jackson:
     default-property-inclusion: non_absent
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    hikari:
-#      auto-commit: false
-#      poolName: Hikari
-#    password: ''
-#    type: com.zaxxer.hikari.HikariDataSource
-#    url: jdbc:postgresql://localhost:5432/rewriteServer
-#    username: rewriteServer
-#  jpa:
-#    hibernate:
-#      ddl-auto: none
-#      naming:
-#        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-#        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-#    open-in-view: false
-#    properties:
-#      hibernate:
-#        connection:
-#          provider_disables_autocommit: true
-#        generate_statistics: false
-#        jdbc:
-#          batch_size: 25
-#          time_zone: UTC
-#        order_inserts: true
-#        order_updates: true
-#        query:
-#          fail_on_pagination_over_collection_fetch: true
-#          in_clause_parameter_padding: true
-server:
-  port: 8443
+
   ssl:
-    enabled: true
-    key-store: classpath:certs/server/server.p12
-    key-store-type: PKCS12
-    key-store-password: changeit
-    key-alias: server_cert
-    trust-store: classpath:certs/server/server_truststore.jks
-    trust-store-type: JKS
-    trust-store-password: changeit
-    client-auth: NEED
+    bundle:
+      pem:
+        client1_cert:
+          keystore:
+            certificate: 'classpath:certs/clients/client1/client1.crt'
+            private-key: 'classpath:certs/clients/client1/client1.key'
+            private-key-password: 'changeit'
+      jks:
+        server_cert:
+          key:
+            alias: 'server_cert'
+          keystore:
+            location: 'classpath:certs/server/server.p12'
+            password: 'changeit'
+            type: 'PKCS12'
+          truststore:
+            location: 'classpath:certs/server/server_truststore.jks'
+            password: 'changeit'
+            type: 'JKS'
+
+server:
+  port: 8080
+  ssl:
+    enabled: false
+  #    client-auth: NEED
+  #    bundle: server_cert
   compression:
     enabled: true
     mime-types: text/xml, text/html, textx/css, application/javascript, application/json

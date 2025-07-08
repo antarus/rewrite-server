@@ -64,7 +64,6 @@ public class NioFileSystemAdapter implements DatastorePort {
 
     try {
       Files.createDirectories(datastorePath);
-
       logPublisher.info("Directory created: " + datastorePath, datastoreId);
 
       Files.createDirectories(Path.of(datastorePath.toString(), rewriteConfig.dsCache()));

@@ -1,80 +1,15 @@
 logging:
   config: classpath:logback.xml
+
 spring:
   main:
     banner-mode: 'off'
 
-  datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    hikari:
-      maximum-pool-size: 2
-    password: ''
-    url: jdbc:tc:postgresql:17.5:///rewriteBack?TC_TMPFS=/testtmpfs:rw
-    username: rewriteBack
-
-  application:
-    name: RewriteServer
-  data:
-    jpa:
-      repositories:
-        bootstrap-mode: deferred
-  task:
-    execution:
-      pool:
-        core-size: 2
-        max-size: 10
-        queue-capacity: 100
-      thread-name-prefix: async-task-
-  jackson:
-    default-property-inclusion: non_absent
-  jpa:
-    hibernate:
-      ddl-auto: none
-      naming:
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-    open-in-view: false
-    properties:
-      hibernate:
-        connection:
-          provider_disables_autocommit: true
-        generate_statistics: false
-        jdbc:
-          batch_size: 25
-          time_zone: UTC
-        order_inserts: true
-        order_updates: true
-        query:
-          fail_on_pagination_over_collection_fetch: true
-          in_clause_parameter_padding: true
 server:
   port: 0
-  ssl:
-    enabled: true
-    key-store: classpath:certs/server/server.p12
-    key-store-type: PKCS12
-    key-store-password: changeit
-    key-alias: server_cert
-    trust-store: classpath:certs/server/server_truststore.jks
-    trust-store-type: JKS
-    trust-store-password: changeit
-    client-auth: NEED
-
-org:
-  jobrunr:
-    job-scheduler:
-      enabled: true
-
-    background-job-server:
-      enabled: true
-      worker-count: 4
-    dashboard:
-      enabled: false
-      port: 8000
-    database:
-      type: sql
 
 rewrite:
   server:
-    config: /home/cedric/rewrite/config
-    work: /home/cedric/rewrite/repository
+    config-directory: '${java.io.tmpdir}/rewrite/${random.uuid}/config'
+    work-directory: '${java.io.tmpdir}/rewrite/${random.uuid}/repository'
+    mvn-path: /home/cedric/.sdkman/candidates/maven/current/bin/mvn

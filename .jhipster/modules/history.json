@@ -298,6 +298,32 @@
         "serverPort": 8080,
         "baseName": "rewriteServer"
       }
+    },
+    {
+      "module": "spring-boot-cucumber-mvc",
+      "date": "2025-07-05T16:06:52.356098526Z",
+      "properties": {
+        "endOfLine": "lf",
+        "springConfigurationFormat": "yaml",
+        "packageName": "fr.rewrite.server",
+        "projectName": "Rewrite server",
+        "indentSize": 2,
+        "serverPort": 8080,
+        "baseName": "rewriteServer"
+      }
+    },
+    {
+      "module": "renovate",
+      "date": "2025-07-06T21:54:46.693114657Z",
+      "properties": {
+        "endOfLine": "lf",
+        "springConfigurationFormat": "yaml",
+        "packageName": "fr.rewrite.server",
+        "projectName": "Rewrite server",
+        "indentSize": 2,
+        "serverPort": 8080,
+        "baseName": "rewriteServer"
+      }
     }
   ]
 }

@@ -141,5 +141,6 @@ docker compose -f src/main/docker/postgresql.yml up -d
 - [CORS configuration](documentation/cors-configuration.md)
 - [PostgreSQL](documentation/postgresql.md)
 - [Application errors](documentation/application-errors.md)
+- [Cucumber](documentation/cucumber.md)
 
 <!-- jhipster-needle-documentation -->

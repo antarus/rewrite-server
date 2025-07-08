@@ -1,10 +1,10 @@
 package fr.rewrite.server.infrastructure.primary;
 
 import fr.rewrite.server.application.DatastoreApplicationService;
+import fr.rewrite.server.domain.datastore.DatastoreId;
 import fr.rewrite.server.domain.datastore.command.DatastoreCreation;
 import fr.rewrite.server.domain.repository.RepositoryURL;
 import jakarta.validation.constraints.NotBlank;
-import java.util.concurrent.ExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,10 +25,9 @@ class DatastoreCommandController {
   }
 
   @PostMapping
-  ResponseEntity<Void> create(@RequestBody RestRepositoryUrl repositoryUrl) throws ExecutionException, InterruptedException {
+  ResponseEntity<RestDatastoreId> create(@RequestBody RestRepositoryUrl repositoryUrl) {
     dataStore.create(new DatastoreCreation(repositoryUrl.toDomain()));
-
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(RestDatastoreId.fromDomain(DatastoreId.from(repositoryUrl.toDomain())));
   }
 
   record RestRepositoryUrl(@NotBlank String url) {
